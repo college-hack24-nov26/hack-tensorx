@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-[1200px] mx-auto px-4 md:px-6 py-4 md:py-8 animate-in fade-in slide-in-from-bottom-10 duration-700">
+    <div class="text-center mb-12">
+        <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter mb-2 uppercase italic text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500">About TensorX</h1>
+        <p class="text-slate-500 text-sm md:text-base font-medium text-blue-600/60 uppercase tracking-widest text-[10px]">AI-Powered ECG Classification System</p>
+    </div>
+
+    <!-- Project Overview -->
+    <div class="bg-white rounded-[2rem] p-8 md:p-10 shadow-2xl shadow-slate-200/50 border border-slate-200 mb-8">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shadow-inner">
+                <i class="fas fa-info-circle text-sm"></i>
+            </div>
+            <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tighter">Project Overview</h2>
+        </div>
+        <div class="prose prose-slate max-w-none">
+            <p class="text-slate-600 leading-relaxed mb-4">
+                <strong>TensorX</strong> is an AI-powered ECG classification system designed to assist healthcare professionals in detecting cardiac abnormalities like Atrial Fibrillation (AFib) and Ventricular Tachycardia (VTCC) in real-time. Built for <strong>Orchathon 2k26</strong>, this system combines advanced machine learning with medical-grade signal processing.
+            </p>
+            <p class="text-slate-600 leading-relaxed">
+                Our mission is to democratize high-accuracy cardiac monitoring using state-of-the-art machine learning models. By providing an accessible platform for ECG analysis, we aim to assist healthcare professionals in early arrhythmia detection and improve patient outcomes.
+            </p>
+        </div>
+    </div>
+
+    <!-- ECG Parameters Explained -->
+    <div class="bg-gradient-to-br from-rose-50 to-orange-50 rounded-[2rem] p-8 md:p-10 shadow-2xl shadow-rose-200/50 border border-rose-200 mb-8">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shadow-inner">
+                <i class="fas fa-heartbeat text-sm"></i>
+            </div>
+            <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tighter">ECG Parameters Explained</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl p-6 border border-rose-200">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center text-sm font-black">II</span>
+                    <h3 class="text-lg font-black text-slate-800 uppercase tracking-tight">Lead II</h3>
+                </div>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    ECG Lead II is one of the standard limb leads that records electrical activity between the right arm (negative) and left leg (positive). It provides the best view of the heart's inferior wall and is commonly used for rhythm analysis because it typically shows clear P waves and QRS complexes.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 border border-rose-200">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-black">25</span>
+                    <h3 class="text-lg font-black text-slate-800 uppercase tracking-tight">Scale: 25mm/s</h3>
+                </div>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    The paper speed or time scale at which the ECG is recorded. At 25mm/s, each small square (1mm) represents 0.04 seconds (40ms), and each large square (5mm) represents 0.2 seconds (200ms). This is the standard speed for ECG recording in most countries.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 border border-rose-200">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-xs font-black">Hz</span>
+                    <h3 class="text-lg font-black text-slate-800 uppercase tracking-tight">Frequency: 250Hz</h3>
+                </div>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    The sampling frequency or rate at which the ECG signal is digitized. At 250Hz, the system captures 250 data points per second. This frequency is sufficient to capture all clinically relevant ECG features including P waves, QRS complexes, and T waves without aliasing.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 border border-rose-200">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs font-black">mV</span>
+                    <h3 class="text-lg font-black text-slate-800 uppercase tracking-tight">Amplitude: Millivolts</h3>
+                </div>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    ECG signals are measured in millivolts (mV). Standard calibration is 10mm = 1mV. The typical QRS complex amplitude ranges from 0.5-2.5mV. Our system preserves the original amplitude scaling for accurate clinical interpretation.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Classification Classes -->
+    <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-[2rem] p-8 md:p-10 shadow-2xl shadow-violet-200/50 border border-violet-200 mb-8">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center shadow-inner">
+                <i class="fas fa-brain text-sm"></i>
+            </div>
+            <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tighter">AI Classification Classes</h2>
+        </div>
+        <p class="text-slate-600 mb-6 leading-relaxed">
+            Our machine learning model is trained to classify ECG signals into three distinct cardiac rhythm categories:
+        </p>
+
+        <div class="space-y-6">
+            <!-- NSR -->
+            <div class="bg-white rounded-2xl p-6 border-2 border-emerald-200">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-inner">
+                        <i class="fas fa-check-circle text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-emerald-600 uppercase tracking-tight">NSR - Normal Sinus Rhythm</h3>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Healthy Cardiac Function</span>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600 leading-relaxed mb-3">
+                    Normal Sinus Rhythm represents a healthy heart rhythm originating from the sinoatrial (SA) node. It is characterized by:
+                </p>
+                <ul class="text-sm text-slate-600 space-y-2 ml-6">
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check text-emerald-500 mt-1"></i>
+                        <span><strong>Regular rhythm:</strong> Consistent R-R intervals with heart rate between 60-100 BPM</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check text-emerald-500 mt-1"></i>
+                        <span><strong>P wave morphology:</strong> Upright P waves in Lead II preceding each QRS complex</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check text-emerald-500 mt-1"></i>
+                        <span><strong>PR interval:</strong> Normal duration (0.12-0.20 seconds)</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check text-emerald-500 mt-1"></i>
+                        <span><strong>QRS complex:</strong> Narrow (<0.12 seconds) and consistent morphology</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- AFib -->
+            <div class="bg-white rounded-2xl p-6 border-2 border-orange-200">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center shadow-inner">
+                        <i class="fas fa-exclamation-triangle text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-orange-600 uppercase tracking-tight">AFib - Atrial Fibrillation</h3>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Irregular Atrial Activity</span>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600 leading-relaxed mb-3">
+                    Atrial Fibrillation is a common cardiac arrhythmia where the atria quiver chaotically instead of contracting effectively. Key features include:
+                </p>
+                <ul class="text-sm text-slate-600 space-y-2 ml-6">
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-times text-orange-500 mt-1"></i>
+                        <span><strong>Irregularly irregular rhythm:</strong> No consistent R-R interval pattern</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-times text-orange-500 mt-1"></i>
+                        <span><strong>Absent P waves:</strong> Replaced by chaotic fibrillatory waves (f-waves)</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-times text-orange-500 mt-1"></i>
+                        <span><strong>Variable ventricular response:</strong> Heart rate typically 80-180 BPM</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-exclamation text-orange-500 mt-1"></i>
+                        <span><strong>Clinical significance:</strong> Increased stroke risk due to blood pooling in atria</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- VTCC -->
+            <div class="bg-white rounded-2xl p-6 border-2 border-rose-200">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shadow-inner">
+                        <i class="fas fa-bolt text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-rose-600 uppercase tracking-tight">VTCC - Ventricular Tachycardia</h3>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Life-Threatening Arrhythmia</span>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600 leading-relaxed mb-3">
+                    Ventricular Tachycardia is a potentially life-threatening arrhythmia originating from the ventricles. Critical characteristics:
+                </p>
+                <ul class="text-sm text-slate-600 space-y-2 ml-6">
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-exclamation-circle text-rose-500 mt-1"></i>
+                        <span><strong>Rapid ventricular rate:</strong> Heart rate >100 BPM (typically 120-250 BPM)</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-exclamation-circle text-rose-500 mt-1"></i>
+                        <span><strong>Wide QRS complexes:</strong> Duration >0.12 seconds with abnormal morphology</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-exclamation-circle text-rose-500 mt-1"></i>
+                        <span><strong>AV dissociation:</strong> Atria and ventricles beat independently</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-skull-crossbones text-rose-500 mt-1"></i>
+                        <span><strong>Emergency status:</strong> Can degenerate into ventricular fibrillation and cardiac arrest</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technology Stack -->
+    <div class="bg-white rounded-[2rem] p-8 md:p-10 shadow-2xl shadow-slate-200/50 border border-slate-200 mb-8">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shadow-inner">
+                <i class="fas fa-code text-sm"></i>
+            </div>
+            <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tighter">Technology Stack</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-server text-blue-500"></i>
+                    <span class="text-sm text-slate-600"><strong>Backend:</strong> FastAPI (Python) for high-performance API routing</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-brain text-violet-500"></i>
+                    <span class="text-sm text-slate-600"><strong>AI/ML:</strong> SVC (Support Vector Classifier) with joblib serialization</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-wave-square text-rose-500"></i>
+                    <span class="text-sm text-slate-600"><strong>Signal Processing:</strong> Scipy for Butterworth bandpass filtering & Savitzky-Golay smoothing</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-robot text-emerald-500"></i>
+                    <span class="text-sm text-slate-600"><strong>LLM Integration:</strong> Groq API with Llama 3.3 70B for clinical analysis</span>
+                </div>
+            </div>
+            <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-palette text-orange-500"></i>
+                    <span class="text-sm text-slate-600"><strong>Frontend:</strong> Jinja2 Templates with Tailwind CSS</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-chart-line text-blue-500"></i>
+                    <span class="text-sm text-slate-600"><strong>Visualization:</strong> Plotly.js with WebGL rendering (scattergl)</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-database text-slate-500"></i>
+                    <span class="text-sm text-slate-600"><strong>Database:</strong> SQLite for prediction history & audit trails</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-book text-violet-500"></i>
+                    <span class="text-sm text-slate-600"><strong>RAG System:</strong> LangChain + FAISS + HuggingFace embeddings</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-[2rem] p-8 md:p-10 shadow-2xl shadow-blue-200/50 border border-blue-200">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shadow-inner">
+                <i class="fas fa-star text-sm"></i>
+            </div>
+            <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tighter">Key Features</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex items-start gap-3">
+                <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                <span class="text-sm text-slate-600"><strong>Multi-Format Support:</strong> JSON and CSV ECG data processing</span>
+            </div>
+            <div class="flex items-start gap-3">
+                <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                <span class="text-sm text-slate-600"><strong>Batch Processing:</strong> Analyze multiple ECG records simultaneously</span>
+            </div>
+            <div class="flex items-start gap-3">
+                <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                <span class="text-sm text-slate-600"><strong>Real-time Visualization:</strong> Interactive ECG waveform rendering</span>
+            </div>
+            <div class="flex items-start gap-3">
+                <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                <span class="text-sm text-slate-600"><strong>Clinical Analysis:</strong> AI-powered interpretation with Groq LLM</span>
+            </div>
+            <div class="flex items-start gap-3">
+                <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                <span class="text-sm text-slate-600"><strong>Patient Profiles:</strong> Comprehensive vitals and demographic tracking</span>
+            </div>
+            <div class="flex items-start gap-3">
+                <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                <span class="text-sm text-slate-600"><strong>RAG Chatbot:</strong> Medical knowledge base with page-level citations</span>
+            </div>
+            <div class="flex items-start gap-3">
+                <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                <span class="text-sm text-slate-600"><strong>Audit Trail:</strong> Persistent prediction history with SQLite</span>
+            </div>
+            <div class="flex items-start gap-3">
+                <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                <span class="text-sm text-slate-600"><strong>Signal Processing:</strong> Advanced filtering and smoothing algorithms</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

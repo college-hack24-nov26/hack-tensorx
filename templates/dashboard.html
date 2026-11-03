@@ -1,0 +1,624 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-4 md:px-6 py-4 md:py-8 animate-in fade-in slide-in-from-bottom-10 duration-700">
+    <div class="flex flex-col lg:row-start-1 lg:flex-row justify-between items-start gap-6 md:gap-8 mb-8 md:mb-10 text-center lg:text-left">
+        <div>
+            <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter mb-2 uppercase italic text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500">Clinical Dashboard</h1>
+            <p class="text-slate-500 text-sm md:text-base font-medium text-blue-600/60 uppercase tracking-widest text-[10px]">Real-time Pattern Recognition & Vital Monitoring</p>
+        </div>
+        
+        <div class="flex gap-2 md:gap-4 p-1.5 bg-slate-200/50 rounded-2xl border border-slate-200 w-full lg:w-auto overflow-x-auto no-scrollbar justify-center">
+            <div class="px-4 py-3 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col items-center min-w-[100px] md:min-w-[120px] shrink-0">
+                <span class="text-[8px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Lead</span>
+                <span class="text-lg md:text-xl font-black text-slate-800 tracking-tighter uppercase">II</span>
+            </div>
+            <div class="px-4 py-3 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col items-center min-w-[100px] md:min-w-[120px] shrink-0">
+                <span class="text-[8px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Scale</span>
+                <span class="text-lg md:text-xl font-black text-slate-800 tracking-tighter italic">25mm/s</span>
+            </div>
+            <div class="px-4 py-3 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col items-center min-w-[100px] md:min-w-[120px] shrink-0">
+                <span class="text-[8px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Freq</span>
+                <span class="text-lg md:text-xl font-black text-slate-800 tracking-tighter italic">250Hz</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vitals Display Row -->
+    <div id="vitalsDisplayContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white p-5 rounded-[1.5rem] border border-slate-200 shadow-xl shadow-slate-200/30 flex items-center gap-4 group hover:border-rose-200 ui-transition">
+            <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center text-xl shadow-inner"><i class="fas fa-heartbeat"></i></div>
+            <div>
+                <span class="block text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Heart Rate</span>
+                <span id="vital_hr" class="text-2xl font-black text-slate-800 italic">-- <span class="text-xs text-slate-300 not-italic uppercase">Bpm</span></span>
+            </div>
+        </div>
+        <div class="bg-white p-5 rounded-[1.5rem] border border-slate-200 shadow-xl shadow-slate-200/30 flex items-center gap-4 group hover:border-blue-200 ui-transition">
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-xl shadow-inner"><i class="fas fa-tint"></i></div>
+            <div>
+                <span class="block text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">BP (Sys/Dia)</span>
+                <span id="vital_bp" class="text-2xl font-black text-slate-800 italic">-- / --</span>
+            </div>
+        </div>
+        <div class="bg-white p-5 rounded-[1.5rem] border border-slate-200 shadow-xl shadow-slate-200/30 flex items-center gap-4 group hover:border-emerald-200 ui-transition">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl shadow-inner"><i class="fas fa-wind"></i></div>
+            <div>
+                <span class="block text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">SpO2 Level</span>
+                <span id="vital_spo2" class="text-2xl font-black text-slate-800 italic">-- <span class="text-xs text-slate-300 not-italic">%</span></span>
+            </div>
+        </div>
+        <div class="bg-white p-5 rounded-[1.5rem] border border-slate-200 shadow-xl shadow-slate-200/30 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center text-xl shadow-inner ui-transition" id="statusIconBox"><i class="fas fa-user-md" id="statusIcon"></i></div>
+            <div class="flex-1">
+                <span class="block text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Clinical Status</span>
+                <span id="recordStatus" class="text-xs font-black text-slate-400 uppercase tracking-tighter italic ui-transition">Awaiting Signal</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-4 gap-6 md:gap-8 items-stretch">
+        <!-- Sidebar Controls -->
+        <div class="xl:col-span-1 space-y-6 md:space-y-8 flex flex-col order-2 xl:order-1">
+            <div class="bg-white rounded-[2rem] p-8 shadow-2xl shadow-slate-200/50 border border-slate-200">
+                <div class="mb-8 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-200"><i class="fas fa-microchip text-sm"></i></div>
+                    <h2 class="text-lg font-black text-slate-800 uppercase tracking-tighter italic underline decoration-blue-500 decoration-4 underline-offset-4">Patient Input</h2>
+                </div>
+                
+                <div class="space-y-4">
+                    <label for="fileInput" class="group cursor-pointer block">
+                        <div class="border-2 border-dashed border-slate-200 rounded-3xl p-8 text-center bg-slate-50 group-hover:bg-blue-50 group-hover:border-blue-400 transition-all ui-transition">
+                            <i class="fas fa-file-upload text-slate-300 text-4xl mb-4 group-hover:scale-110 ui-transition"></i>
+                            <p class="text-xs font-black text-slate-500 group-hover:text-blue-600 uppercase tracking-widest" id="fileNameDisplay">Tap to Load Signal</p>
+                        </div>
+                    </label>
+                    <input type="file" id="fileInput" class="hidden" onchange="handleFileSelect(this)">
+
+                    <div class="grid grid-cols-1 gap-3">
+                        <button onclick="openVitalsModal()" class="w-full bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-200 font-black py-4 rounded-2xl transition-all active:scale-[0.98] text-xs uppercase tracking-widest flex items-center justify-center gap-2">
+                            <i class="fas fa-stethoscope text-emerald-500"></i> Measure Vitals
+                        </button>
+                        <button onclick="upload()" id="analyzeBtn" disabled class="w-full bg-slate-900 hover:bg-black text-white font-black py-5 rounded-2xl shadow-2xl shadow-slate-400 transition-all active:scale-[0.98] text-sm uppercase tracking-[0.2em] italic disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-slate-900">
+                            Run AI Engine
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="errorDisplay" class="hidden mt-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-[10px] font-bold text-center animate-pulse"></div>
+            </div>
+
+            <!-- AI Result Card -->
+            <div id="resultCard" class="bg-slate-900 rounded-[2rem] p-8 shadow-2xl shadow-blue-900/20 border border-slate-800 flex-1 flex flex-col justify-center min-h-[300px] text-center ui-transition">
+                <div id="resultIdle">
+                    <i class="fas fa-brain text-slate-800 text-5xl mb-6 animate-pulse"></i>
+                    <p class="text-slate-600 font-bold uppercase tracking-[0.3em] text-[10px]">Neural core ready...</p>
+                </div>
+                <div id="resultOutput" class="hidden"></div>
+            </div>
+
+            <!-- LLM Clinical Analysis Card -->
+            <div id="llmCard" class="hidden bg-white rounded-[2rem] p-8 shadow-2xl shadow-slate-200/50 border border-slate-200 ui-transition">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center shadow-inner"><i class="fas fa-robot text-sm"></i></div>
+                    <div>
+                        <h3 class="text-sm font-black text-slate-800 uppercase tracking-tighter">AI Clinical Analysis</h3>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Llama 4 · Groq</p>
+                    </div>
+                </div>
+                <p id="llmInterpretation" class="text-xs text-slate-600 font-medium leading-relaxed mb-6 border-l-4 border-violet-300 pl-4 italic"></p>
+                <div>
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Quick Actions</p>
+                    <ol id="llmSteps" class="space-y-2"></ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- ECG Strip -->
+        <div class="xl:col-span-3 order-1 xl:order-2">
+            <div class="bg-white rounded-[2rem] p-4 md:p-10 shadow-2xl shadow-slate-200/50 border border-slate-200 h-full flex flex-col min-h-[650px]">
+                <div class="flex justify-between items-center mb-8">
+                    <div class="flex flex-col">
+                        <h2 class="text-xl md:text-2xl font-black text-slate-800 uppercase tracking-tighter leading-none mb-1">Electrocardiogram (Lead II)</h2>
+                        <span id="plotTitleLabel" class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Signal: RAW DATA</span>
+                    </div>
+                    <div class="flex items-center gap-3 px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-[10px] font-black border border-rose-100 uppercase animate-pulse">
+                        <span class="w-2 h-2 rounded-full bg-rose-600"></span> LIVE CAPTURE
+                    </div>
+                </div>
+
+                <div id="plotContainer" class="flex-1 rounded-[1.5rem] border border-slate-800 relative overflow-hidden shadow-inner" style="background:#0d1117; min-height:520px;">
+                    <div id="plot" style="width:100%;height:100%;min-height:520px;"></div>
+                    <div id="plotIdle" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400/20 pointer-events-none p-4 text-center">
+                        <i class="fas fa-wave-square text-8xl mb-6"></i>
+                        <p class="font-black text-xs md:text-base uppercase tracking-[0.5em]">System Sync Required</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="vitalsModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeVitalsModal()"></div>
+    <div class="relative bg-white w-full max-w-2xl rounded-[2.5rem] p-8 md:p-10 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shadow-inner"><i class="fas fa-user-injured"></i></div>
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight uppercase italic">Patient Profile</h2>
+            </div>
+            <button onclick="closeVitalsModal()" class="text-slate-300 hover:text-slate-900 transition-colors text-xl"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="space-y-6">
+            <!-- Patient Info Section -->
+            <div class="bg-slate-50 rounded-2xl p-6 border-2 border-slate-100">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <i class="fas fa-id-card text-blue-500"></i> Patient Information
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="group">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Full Name *</label>
+                        <input type="text" id="input_name" value="John Doe" class="w-full bg-white border-2 border-slate-200 rounded-2xl px-6 py-3 text-sm font-bold focus:border-blue-500 outline-none transition-all">
+                    </div>
+                    <div class="group">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Age *</label>
+                        <input type="number" id="input_age" value="45" class="w-full bg-white border-2 border-slate-200 rounded-2xl px-6 py-3 text-sm font-bold focus:border-blue-500 outline-none transition-all">
+                    </div>
+                    <div class="group">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Email ID</label>
+                        <input type="email" id="input_email" value="john.doe@example.com" class="w-full bg-white border-2 border-slate-200 rounded-2xl px-6 py-3 text-sm font-medium focus:border-blue-500 outline-none transition-all">
+                    </div>
+                    <div class="group">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Blood Group</label>
+                        <select id="input_blood_group" class="w-full bg-white border-2 border-slate-200 rounded-2xl px-6 py-3 text-sm font-bold focus:border-blue-500 outline-none transition-all">
+                            <option value="">Select</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+" selected>B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vital Signs Section -->
+            <div class="bg-rose-50 rounded-2xl p-6 border-2 border-rose-100">
+                <h3 class="text-[10px] font-black text-rose-600 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <i class="fas fa-heartbeat"></i> Vital Signs
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="group">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Heart Rate (BPM)</label>
+                        <input type="number" id="input_hr" value="72" placeholder="60-100" class="w-full bg-white border-2 border-rose-200 rounded-2xl px-6 py-3 text-lg font-black italic focus:border-rose-500 outline-none transition-all">
+                    </div>
+                    <div class="group">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">SpO2 Oxygen (%)</label>
+                        <input type="number" id="input_spo2" value="98" placeholder="95-100" class="w-full bg-white border-2 border-rose-200 rounded-2xl px-6 py-3 text-lg font-black italic focus:border-rose-500 outline-none transition-all">
+                    </div>
+                    <div class="group">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">BP Systolic (mmHg)</label>
+                        <input type="number" id="input_bp_sys" value="120" placeholder="90-140" class="w-full bg-white border-2 border-rose-200 rounded-2xl px-6 py-3 text-lg font-black italic focus:border-rose-500 outline-none transition-all">
+                    </div>
+                    <div class="group">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">BP Diastolic (mmHg)</label>
+                        <input type="number" id="input_bp_dia" value="80" placeholder="60-90" class="w-full bg-white border-2 border-rose-200 rounded-2xl px-6 py-3 text-lg font-black italic focus:border-rose-500 outline-none transition-all">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Vitals Section -->
+            <div class="bg-amber-50 rounded-2xl p-6 border-2 border-amber-100">
+                <h3 class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <i class="fas fa-vial"></i> Lab Values (Optional)
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="group">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Blood Sugar (mg/dL)</label>
+                        <input type="number" id="input_sugar" value="95" placeholder="70-140" class="w-full bg-white border-2 border-amber-200 rounded-2xl px-6 py-3 text-sm font-bold focus:border-amber-500 outline-none transition-all">
+                    </div>
+                    <div class="group">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Temperature (°F)</label>
+                        <input type="number" step="0.1" id="input_temp" value="98.6" placeholder="97-99" class="w-full bg-white border-2 border-amber-200 rounded-2xl px-6 py-3 text-sm font-bold focus:border-amber-500 outline-none transition-all">
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="confirmVitals()" class="w-full bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white font-black py-5 rounded-2xl shadow-xl shadow-blue-200 transition-all active:scale-95 uppercase tracking-widest">
+                <i class="fas fa-save mr-2"></i>Save Patient Profile
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+const fileInput = document.getElementById('fileInput');
+const fileNameDisplay = document.getElementById('fileNameDisplay');
+const errorDisplay = document.getElementById('errorDisplay');
+const analyzeBtn = document.getElementById('analyzeBtn');
+const plotIdle = document.getElementById('plotIdle');
+const vitalsModal = document.getElementById('vitalsModal');
+const plotLabel = document.getElementById('plotTitleLabel');
+
+let state = { hasFile: false, hasVitals: false, isAnalyzed: false };
+let batchSignals = {};  // row index -> filtered_signal array
+let lastAnalysisResult = null;
+
+window.onload = function() { loadVitalsFromStorage(); updateClinicalStatus(); };
+
+function saveVitalsToStorage() {
+    const vitals = { 
+        name: document.getElementById("input_name").value,
+        age: document.getElementById("input_age").value,
+        email: document.getElementById("input_email").value,
+        blood_group: document.getElementById("input_blood_group").value,
+        hr: document.getElementById("input_hr").value, 
+        sys: document.getElementById("input_bp_sys").value, 
+        dia: document.getElementById("input_bp_dia").value, 
+        spo2: document.getElementById("input_spo2").value,
+        sugar: document.getElementById("input_sugar").value,
+        temp: document.getElementById("input_temp").value
+    };
+    localStorage.setItem('tensorx_vitals', JSON.stringify(vitals));
+}
+
+function loadVitalsFromStorage() {
+    const saved = localStorage.getItem('tensorx_vitals');
+    if (saved) {
+        const v = JSON.parse(saved);
+        if (v.name) document.getElementById("input_name").value = v.name;
+        if (v.age) document.getElementById("input_age").value = v.age;
+        if (v.email) document.getElementById("input_email").value = v.email;
+        if (v.blood_group) document.getElementById("input_blood_group").value = v.blood_group;
+        if (v.hr) document.getElementById("input_hr").value = v.hr;
+        if (v.sys) document.getElementById("input_bp_sys").value = v.sys;
+        if (v.dia) document.getElementById("input_bp_dia").value = v.dia;
+        if (v.spo2) document.getElementById("input_spo2").value = v.spo2;
+        if (v.sugar) document.getElementById("input_sugar").value = v.sugar;
+        if (v.temp) document.getElementById("input_temp").value = v.temp;
+        if (v.hr || v.sys || v.spo2) { state.hasVitals = true; updateVitalsDisplay(); }
+    }
+}
+
+function updateClinicalStatus() {
+    const status = document.getElementById("recordStatus");
+    const box = document.getElementById("statusIconBox");
+    const icon = document.getElementById("statusIcon");
+    
+    // Enable/Disable button based on file selection
+    analyzeBtn.disabled = !state.hasFile;
+
+    if (state.isAnalyzed) { status.innerText = "Clinical-Ready"; status.className = "text-xs font-black text-emerald-500 uppercase tracking-tighter italic animate-pulse"; box.className = "w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl shadow-inner"; icon.className = "fas fa-check-circle"; }
+    else if (state.hasFile && state.hasVitals) { status.innerText = "Ready for Engine"; status.className = "text-xs font-black text-blue-500 uppercase tracking-tighter italic"; box.className = "w-12 h-12 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-xl shadow-inner"; icon.className = "fas fa-microchip animate-spin-slow"; }
+    else if (state.hasFile) { status.innerText = "Signal Synced"; status.className = "text-xs font-black text-blue-400 uppercase tracking-tighter italic"; box.className = "w-12 h-12 rounded-2xl bg-slate-50 text-blue-400 flex items-center justify-center text-xl shadow-inner"; icon.className = "fas fa-wave-square"; }
+    else if (state.hasVitals) { status.innerText = "Vitals Measured"; status.className = "text-xs font-black text-emerald-400 uppercase tracking-tighter italic"; box.className = "w-12 h-12 rounded-2xl bg-slate-50 text-emerald-400 flex items-center justify-center text-xl shadow-inner"; icon.className = "fas fa-stethoscope"; }
+    else { status.innerText = "Awaiting Signal"; status.className = "text-xs font-black text-slate-400 uppercase tracking-tighter italic"; box.className = "w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center text-xl shadow-inner"; icon.className = "fas fa-user-md"; }
+}
+
+function handleFileSelect(input) {
+    const file = input.files[0]; 
+    if (!file) {
+        state.hasFile = false;
+        fileNameDisplay.innerText = "Tap to Load Signal";
+        fileNameDisplay.className = "text-xs font-black text-slate-500 group-hover:text-blue-600 uppercase tracking-widest";
+        updateClinicalStatus();
+        return;
+    }
+    fileNameDisplay.innerText = file.name.toUpperCase();
+    fileNameDisplay.className = "text-[10px] font-black text-blue-600 break-all px-2";
+    state.hasFile = true; state.isAnalyzed = false;
+    plotLabel.innerText = "Signal: AWAITING PREPROCESSING";
+    plotLabel.className = "text-[10px] font-black text-slate-400 uppercase tracking-widest italic";
+    resetAnalysisUI();
+    // Reset plot to idle — never plot raw unprocessed data
+    plotIdle.style.display = 'flex';
+    plotIdle.innerHTML = '<i class="fas fa-file-waveform text-8xl mb-6"></i><p class="font-black text-xs md:text-base uppercase tracking-[0.5em]">Signal Loaded · Run AI Engine</p>';
+    Plotly.purge('plot');
+    updateClinicalStatus();
+}
+
+function resetAnalysisUI() {
+    errorDisplay.classList.add('hidden');
+    document.getElementById('llmCard').classList.add('hidden');
+    document.getElementById("resultIdle").classList.remove('hidden');
+    document.getElementById("resultOutput").classList.add('hidden');
+    document.getElementById("resultCard").className = "bg-slate-900 rounded-[2rem] p-8 shadow-2xl shadow-blue-900/20 border border-slate-800 flex-1 flex flex-col justify-center min-h-[300px] text-center ui-transition";
+}
+
+function openVitalsModal() { vitalsModal.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+function closeVitalsModal() { vitalsModal.classList.add('hidden'); document.body.style.overflow = 'auto'; }
+function confirmVitals() { const hr = document.getElementById("input_hr").value; if (hr) { state.hasVitals = true; saveVitalsToStorage(); updateVitalsDisplay(); updateClinicalStatus(); } closeVitalsModal(); }
+
+function updateVitalsDisplay() {
+    const hr = document.getElementById("input_hr").value; const sys = document.getElementById("input_bp_sys").value;
+    const dia = document.getElementById("input_bp_dia").value; const spo2 = document.getElementById("input_spo2").value;
+    if (hr) document.getElementById("vital_hr").innerHTML = hr + ' <span class="text-xs text-slate-300 not-italic uppercase">Bpm</span>';
+    if (sys && dia) document.getElementById("vital_bp").innerHTML = sys + ' / ' + dia;
+    if (spo2) document.getElementById("vital_spo2").innerHTML = spo2 + ' <span class="text-xs text-slate-300 not-italic">%</span>';
+}
+
+async function upload() {
+    const file = fileInput.files[0]; if (!file) return;
+    analyzeBtn.disabled = true; analyzeBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> CALCULATING...';
+    const formData = new FormData(); formData.append("file", file);
+    
+    // Get Vitals
+    const hr = document.getElementById("input_hr").value; const sys = document.getElementById("input_bp_sys").value;
+    const dia = document.getElementById("input_bp_dia").value; const spo2 = document.getElementById("input_spo2").value;
+    if (hr) formData.append("heart_rate", hr); if (sys) formData.append("bp_sys", sys); if (dia) formData.append("bp_dia", dia); if (spo2) formData.append("spo2", spo2);
+
+    // Get Patient Info
+    const p_name = document.getElementById("input_name").value;
+    const p_email = document.getElementById("input_email").value;
+    const p_age = document.getElementById("input_age").value;
+    const p_blood = document.getElementById("input_blood_group").value;
+    formData.append("patient_name", p_name);
+    formData.append("patient_email", p_email);
+    if (p_age) formData.append("patient_age", p_age);
+    if (p_blood) formData.append("patient_blood_group", p_blood);
+
+    try {
+        const res = await fetch("/predict", { method: "POST", body: formData });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail);
+
+        lastAnalysisResult = data; // Store for PDF generation
+        
+        // Add patient_data to lastAnalysisResult if it's a single prediction
+        if (!data.batch) {
+            lastAnalysisResult.patient_data = {
+                name: p_name,
+                email: p_email,
+                age: p_age,
+                blood_group: p_blood
+            };
+        }
+
+        if (data.batch) {
+            batchSignals = {};
+            data.results.forEach(r => { if (r.filtered_signal) batchSignals[r.row] = r.filtered_signal; });
+            renderBatchResults(data.results);
+            // plot first valid signal
+            const first = data.results.find(r => r.filtered_signal);
+            if (first) {
+                plotLabel.innerText = `BATCH · ${data.results.length} RECORDS · SHOWING ROW ${first.row}`;
+                plotLabel.className = "text-[10px] font-black text-violet-500 uppercase tracking-widest italic animate-pulse";
+                renderPlotData(first.filtered_signal, first.prediction);
+            }
+        } else {
+            renderResults(data); renderVitals(data.vitals);
+            plotLabel.innerText = "Signal: AI FILTERED (Baseline Removed · 0.5-40Hz)";
+            plotLabel.className = "text-[10px] font-black text-blue-500 uppercase tracking-widest italic animate-pulse";
+            renderPlotData(data.filtered_signal, data.prediction);
+            if (data.llm_analysis) renderLLMAnalysis(data.llm_analysis);
+        }
+
+        state.isAnalyzed = true; updateClinicalStatus();
+    } catch (err) { errorDisplay.innerText = "ERROR: " + err.message; errorDisplay.classList.remove('hidden'); }
+    finally { analyzeBtn.disabled = false; analyzeBtn.innerHTML = 'RUN AI ENGINE'; }
+}
+
+function renderVitals(vitals) {
+    if (!vitals) return;
+    if (vitals.heart_rate) state.hasVitals = true;
+    updateVitalsDisplay();
+    if (!document.getElementById("input_hr").value) document.getElementById("input_hr").value = vitals.heart_rate || '';
+    if (!document.getElementById("input_bp_sys").value) document.getElementById("input_bp_sys").value = vitals.bp_sys || '';
+    if (!document.getElementById("input_bp_dia").value) document.getElementById("input_bp_dia").value = vitals.bp_dia || '';
+    if (!document.getElementById("input_spo2").value) document.getElementById("input_spo2").value = vitals.spo2 || '';
+    updateClinicalStatus();
+}
+
+function renderResults(data) {
+    const output = document.getElementById("resultOutput"); const idle = document.getElementById("resultIdle"); const card = document.getElementById("resultCard");
+    idle.classList.add('hidden'); output.classList.remove('hidden');
+    const isNSR = data.prediction === 'NSR'; const isAFib = data.prediction === 'AFib';
+    let colorClass = "text-emerald-400"; let borderClass = "border-emerald-500/30";
+    if (isAFib) { colorClass = "text-orange-400"; borderClass = "border-orange-500/30"; }
+    else if (data.prediction === 'VTCC') { colorClass = "text-rose-500"; borderClass = "border-rose-500/30"; }
+    card.className = `bg-slate-900 rounded-[2rem] p-8 border shadow-2xl ui-transition ${borderClass}`;
+    output.innerHTML = `
+        <div class="mb-8"><span class="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] block mb-2">Automated diagnosis</span>
+        <div class="text-4xl md:text-5xl font-black ${colorClass} uppercase tracking-tighter italic">${data.prediction}</div></div>
+        <div class="space-y-6 mb-10 px-2 text-left">
+            ${Object.entries(data.probabilities).map(([cls, prob]) => `
+                <div><div class="flex justify-between text-[8px] font-black uppercase tracking-widest text-slate-500 mb-1.5"><span>${cls}</span><span>${(prob*100).toFixed(1)}%</span></div>
+                <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden border border-slate-700/50"><div class="h-full rounded-full transition-all duration-1000 ${cls === data.prediction ? (isNSR ? 'bg-emerald-400' : (isAFib ? 'bg-orange-400' : 'bg-rose-500')) : 'bg-slate-700 opacity-20'}" style="width: ${prob*100}%"></div></div></div>
+            `).join('')}
+        </div>
+        <div class="pt-6 border-t border-slate-800 flex flex-col items-center justify-center gap-4">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-certificate ${colorClass} text-[10px]"></i>
+                <span class="text-[8px] font-black text-slate-500 uppercase tracking-widest">Inference Verified</span>
+            </div>
+            <button onclick="downloadReport()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 border border-slate-700">
+                <i class="fas fa-file-pdf"></i> Download Report
+            </button>
+        </div>`;
+}
+
+async function downloadReport() {
+    if (!lastAnalysisResult || lastAnalysisResult.batch) {
+        alert("Report generation is only available for single signal analysis.");
+        return;
+    }
+    
+    try {
+        const btn = event.currentTarget;
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> GENERATING...';
+
+        const response = await fetch("/download-report", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                patient_data: lastAnalysisResult.patient_data,
+                prediction: lastAnalysisResult.prediction,
+                probabilities: lastAnalysisResult.probabilities,
+                vitals: lastAnalysisResult.vitals,
+                analysis: lastAnalysisResult.llm_analysis,
+                filtered_signal: lastAnalysisResult.filtered_signal
+            })
+        });
+
+        if (!response.ok) throw new Error("Failed to generate report");
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `TensorX_Report_${new Date().getTime()}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    } catch (err) {
+        alert("Error generating report: " + err.message);
+    }
+}
+
+function renderLLMAnalysis(llm) {
+    const card = document.getElementById('llmCard');
+    document.getElementById('llmInterpretation').innerText = llm.interpretation || 'No interpretation available.';
+    const steps = document.getElementById('llmSteps');
+    steps.innerHTML = (llm.quick_steps || []).map((s, i) =>
+        `<li class="flex gap-3 text-xs text-slate-700 font-medium">
+            <span class="w-5 h-5 rounded-full bg-violet-100 text-violet-600 font-black text-[9px] flex items-center justify-center shrink-0 mt-0.5">${i+1}</span>
+            <span>${s}</span>
+        </li>`
+    ).join('');
+    card.classList.remove('hidden');
+}
+
+function renderBatchResults(results) {
+    const idle = document.getElementById('resultIdle');
+    const output = document.getElementById('resultOutput');
+    const card = document.getElementById('resultCard');
+    idle.classList.add('hidden');
+    output.classList.remove('hidden');
+    card.className = 'bg-slate-900 rounded-[2rem] p-6 border border-slate-700 shadow-2xl ui-transition';
+
+    const colorMap = { NSR: '#10b981', AFib: '#f59e0b', VTCC: '#f43f5e' };
+    const bgMap    = { NSR: 'bg-emerald-900/40 border-emerald-700', AFib: 'bg-orange-900/40 border-orange-700', VTCC: 'bg-rose-900/40 border-rose-700' };
+
+    output.innerHTML = `
+        <div class="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4">
+            Batch · ${results.length} Records
+        </div>
+        <div class="space-y-3 max-h-[600px] overflow-y-auto pr-1 no-scrollbar">
+        ${ results.map(r => {
+            if (r.error) return `
+                <div class="rounded-2xl border border-slate-700 bg-slate-800 p-4">
+                    <span class="text-[9px] font-black text-slate-500 uppercase">Row ${r.row}</span>
+                    <p class="text-[10px] text-rose-400 mt-1">${r.error}</p>
+                </div>`;
+            const col = colorMap[r.prediction] || '#94a3b8';
+            const bg  = bgMap[r.prediction]    || 'bg-slate-800 border-slate-700';
+            const probs = Object.entries(r.probabilities);
+            return `
+                <div class="rounded-2xl border ${bg} p-4 cursor-pointer hover:opacity-90 transition-opacity"
+                     onclick="renderPlotData(batchSignals[${r.row}], '${r.prediction}'); plotLabel.innerText='Row ${r.row} · ${r.prediction}'">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[9px] font-black text-slate-400 uppercase">Row ${r.row}</span>
+                        <span class="text-sm font-black uppercase tracking-tighter" style="color:${col}">${r.prediction}</span>
+                    </div>
+                    ${ probs.map(([cls, p]) => `
+                        <div class="mb-1.5">
+                            <div class="flex justify-between text-[8px] font-black text-slate-500 uppercase mb-0.5"><span>${cls}</span><span>${(p*100).toFixed(1)}%</span></div>
+                            <div class="w-full bg-slate-800 h-0.5 rounded-full"><div class="h-full rounded-full" style="width:${p*100}%;background:${cls===r.prediction?col:'#334155'}"></div></div>
+                        </div>`).join('') }
+                </div>`;
+        }).join('') }
+        </div>`;
+}
+
+function renderPlotData(arr, prediction) {
+    plotIdle.style.display = 'none';
+
+    let lineColor = '#2ecc71';
+    if (prediction === 'AFib') lineColor = '#f59e0b';
+    else if (prediction === 'VTCC') lineColor = '#f43f5e';
+
+    const timeArr = Array.from({length: arr.length}, (_, i) => +(i / 250).toFixed(4));
+
+    // Compute y-range with 20% padding so peaks never touch the axis edge
+    const yMin = Math.min(...arr);
+    const yMax = Math.max(...arr);
+    const yPad = (yMax - yMin) * 0.20;
+    const yRange = [+(yMin - yPad).toFixed(3), +(yMax + yPad).toFixed(3)];
+
+    const layout = {
+        autosize: true,
+        margin: { t: 16, b: 60, l: 52, r: 16 },
+        plot_bgcolor: '#0d1117',
+        paper_bgcolor: 'transparent',
+        font: { family: 'Inter', color: '#94a3b8' },
+        xaxis: {
+            title: { text: 'Time (s)', font: { size: 10, color: '#475569' } },
+            dtick: 0.2,
+            tick0: 0,
+            tickformat: '.1f',
+            gridcolor: '#7f1d1d',
+            gridwidth: 1,
+            minor: { dtick: 0.04, gridcolor: '#1f0a0a', showgrid: true },
+            zeroline: false,
+            showline: true,
+            linecolor: '#7f1d1d',
+            tickcolor: '#475569',
+            ticks: 'outside',
+            rangeslider: {
+                visible: true,
+                bgcolor: '#0d1117',
+                bordercolor: '#7f1d1d',
+                borderwidth: 1,
+                thickness: 0.06,
+            },
+            range: [0, arr.length / 250],
+        },
+        yaxis: {
+            title: { text: 'mV', font: { size: 10, color: '#475569' } },
+            dtick: 0.2,
+            gridcolor: '#7f1d1d',
+            gridwidth: 1,
+            minor: { dtick: 0.04, gridcolor: '#1f0a0a', showgrid: true },
+            range: yRange,
+            zeroline: true,
+            zerolinecolor: '#991b1b',
+            zerolinewidth: 1,
+            showline: true,
+            linecolor: '#7f1d1d',
+            tickcolor: '#475569',
+            ticks: 'outside',
+            fixedrange: true,
+        },
+    };
+
+    Plotly.newPlot('plot',
+        [{
+            x: timeArr,
+            y: arr,
+            type: 'scattergl',
+            mode: 'lines',
+            line: { color: lineColor, width: 1.2, shape: 'linear' },
+            hovertemplate: '<b>%{x:.3f} s</b><br>%{y:.4f} mV<extra></extra>',
+            hoverlabel: { bgcolor: '#1e293b', bordercolor: lineColor, font: { color: '#f1f5f9', size: 11 } },
+        }],
+        layout,
+        { responsive: true, displayModeBar: false, scrollZoom: false }
+    );
+}
+</script>
+
+<style>
+    .animate-spin-slow { animation: spin 3s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .ecg-grid { background-image: linear-gradient(to right, #f1f5f9 1px, transparent 1px), linear-gradient(to bottom, #f1f5f9 1px, transparent 1px); background-size: 20px 20px; }
+</style>
+{% endblock %}
