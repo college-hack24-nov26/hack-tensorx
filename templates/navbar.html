@@ -1,0 +1,47 @@
+<nav class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-white px-4 md:px-8 py-3 flex items-center justify-between shadow-xl">
+    <!-- Brand -->
+    <a href="/" class="flex items-center gap-2 group transition-transform active:scale-95">
+        <div class="bg-blue-600 p-1.5 rounded-lg shadow-lg shadow-blue-600/20 group-hover:rotate-12 transition-transform">
+            <i class="fas fa-heartbeat text-sm md:text-lg"></i>
+        </div>
+        <div class="leading-none">
+            <span class="text-base md:text-xl font-black tracking-tighter uppercase">Tensor<span class="text-blue-500">X</span></span>
+            <span class="block text-[8px] text-slate-400 font-bold tracking-[0.2em] uppercase">CLINICAL</span>
+        </div>
+    </a>
+    
+    <!-- Compact Mobile Menu -->
+    <div class="flex items-center bg-slate-800/50 rounded-full px-2 py-1 md:bg-transparent md:p-0 md:gap-6">
+        <a href="/" class="p-2 md:p-0 flex flex-col items-center gap-0.5 md:flex-row md:gap-2 transition-all {% if active_page == 'home' %}text-blue-400 font-black{% else %}text-slate-400 hover:text-slate-200{% endif %}">
+            <i class="fas fa-home text-xs md:hidden"></i>
+            <span class="text-[9px] md:text-sm font-bold uppercase md:capitalize">Home</span>
+        </a>
+        <a href="/dashboard" class="p-2 md:p-0 flex flex-col items-center gap-0.5 md:flex-row md:gap-2 transition-all {% if active_page == 'dashboard' %}text-blue-400 font-black{% else %}text-slate-400 hover:text-slate-200{% endif %}">
+            <i class="fas fa-chart-line text-xs md:hidden"></i>
+            <span class="text-[9px] md:text-sm font-bold uppercase md:capitalize">Dashboard</span>
+        </a>
+        <a href="/chatbot" class="p-2 md:p-0 flex flex-col items-center gap-0.5 md:flex-row md:gap-2 transition-all {% if active_page == 'chatbot' %}text-blue-400 font-black{% else %}text-slate-400 hover:text-slate-200{% endif %}">
+            <i class="fas fa-robot text-xs md:hidden"></i>
+            <span class="text-[9px] md:text-sm font-bold uppercase md:capitalize">Chatbot</span>
+        </a>
+        <a href="/history" class="p-2 md:p-0 flex flex-col items-center gap-0.5 md:flex-row md:gap-2 transition-all {% if active_page == 'history' %}text-blue-400 font-black{% else %}text-slate-400 hover:text-slate-200{% endif %}">
+            <i class="fas fa-history text-xs md:hidden"></i>
+            <span class="text-[9px] md:text-sm font-bold uppercase md:capitalize">History</span>
+        </a>
+        <a href="/about" class="p-2 md:p-0 flex flex-col items-center gap-0.5 md:flex-row md:gap-2 transition-all {% if active_page == 'about' %}text-blue-400 font-black{% else %}text-slate-400 hover:text-slate-200{% endif %}">
+            <i class="fas fa-info-circle text-xs md:hidden"></i>
+            <span class="text-[9px] md:text-sm font-bold uppercase md:capitalize">About</span>
+        </a>
+    </div>
+
+    <!-- Active Doctor (Desktop Only) -->
+    <div class="hidden md:flex items-center gap-3 pl-6 border-l border-slate-700">
+        <div class="text-right">
+            <div class="text-[10px] font-bold text-slate-500 leading-none">DOCTOR</div>
+            <div class="text-[11px] font-black text-emerald-400 uppercase tracking-tighter">AUTHENTICATED</div>
+        </div>
+        <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-500 border border-slate-700">
+            <i class="fas fa-user-md text-xs"></i>
+        </div>
+    </div>
+</nav>

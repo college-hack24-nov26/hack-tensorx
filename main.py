@@ -2,7 +2,6 @@ from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-
 import os
 from dotenv import load_dotenv
 
@@ -18,17 +17,10 @@ if not os.path.exists(STATIC_DIR):
     os.makedirs(STATIC_DIR)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
+
 @app.get("/")
 def home(request: Request):
     return templates.TemplateResponse(request=request, name="home.html", context={"active_page": "home"})
-
-@app.get("/dashboard")
-def dashboard(request: Request):
-    return templates.TemplateResponse(request=request, name="dashboard.html", context={"active_page": "dashboard"})
-
-@app.get("/about")
-def about(request: Request):
-    return templates.TemplateResponse(request=request, name="about.html", context={"active_page": "about"})
 
 if __name__ == "__main__":
     import uvicorn
@@ -45,4 +37,4 @@ if __name__ == "__main__":
     print(f" Network Access: http://{local_ip}:{port}")
     print("="*50 + "\n")
 
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(app)
