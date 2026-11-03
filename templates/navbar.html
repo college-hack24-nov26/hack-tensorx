@@ -20,6 +20,11 @@
             <i class="fas fa-chart-line text-xs md:hidden"></i>
             <span class="text-[9px] md:text-sm font-bold uppercase md:capitalize">Dashboard</span>
         </a>
+        <a href="/live" class="p-2 md:p-0 flex flex-col items-center gap-0.5 md:flex-row md:gap-2 transition-all {% if active_page == 'live' %}text-emerald-400 font-black{% else %}text-slate-400 hover:text-slate-200{% endif %}">
+            <i class="fas fa-wave-square text-xs md:hidden"></i>
+            <span class="text-[9px] md:text-sm font-bold uppercase md:capitalize">Live</span>
+            {% if active_page == 'live' %}<span class="hidden md:inline-flex w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>{% endif %}
+        </a>
         <a href="/chatbot" class="p-2 md:p-0 flex flex-col items-center gap-0.5 md:flex-row md:gap-2 transition-all {% if active_page == 'chatbot' %}text-blue-400 font-black{% else %}text-slate-400 hover:text-slate-200{% endif %}">
             <i class="fas fa-robot text-xs md:hidden"></i>
             <span class="text-[9px] md:text-sm font-bold uppercase md:capitalize">Chatbot</span>

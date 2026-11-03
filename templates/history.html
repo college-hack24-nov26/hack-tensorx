@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-8 animate-in fade-in slide-in-from-bottom-10 duration-700">
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+        <h1 class="text-2xl md:text-3xl font-black italic uppercase tracking-tighter text-slate-900 underline decoration-blue-500 decoration-4 underline-offset-4">Patient Records</h1>
+        <div class="flex items-center gap-3">
+            <div class="text-slate-400 text-[10px] md:text-xs font-bold uppercase tracking-widest bg-slate-100 px-4 py-1.5 rounded-full border border-slate-200 shadow-inner">
+                Diagnostic Audit Trail
+            </div>
+            {% if data %}
+            <button onclick="document.getElementById('clearModal').classList.remove('hidden')" class="flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100 transition-all">
+                <i class="fas fa-trash-alt text-[9px]"></i> Clear History
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div id="clearModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="document.getElementById('clearModal').classList.add('hidden')"></div>
+        <div class="relative bg-white w-full max-w-sm rounded-[2rem] p-8 shadow-2xl border border-slate-100">
+            <div class="flex flex-col items-center text-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center text-2xl">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h2 class="text-lg font-black text-slate-900 uppercase tracking-tighter">Clear All Records?</h2>
+                <p class="text-xs text-slate-500 font-medium">This will permanently delete all diagnostic audit trail entries. This action cannot be undone.</p>
+                <div class="flex gap-3 w-full mt-2">
+                    <button onclick="document.getElementById('clearModal').classList.add('hidden')" class="flex-1 py-3 rounded-2xl border-2 border-slate-200 text-slate-600 font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all">Cancel</button>
+                    <form method="POST" action="/history/clear" class="flex-1">
+                        <button type="submit" class="w-full py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs uppercase tracking-widest transition-all">Delete All</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl shadow-slate-200/60 border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto no-scrollbar">
+            <table class="w-full text-left border-collapse min-w-[900px]">
+                <thead>
+                    <tr class="bg-slate-50/50 border-b border-slate-200">
+                        <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">ID & Timestamp</th>
+                        <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Diagnosis</th>
+                        <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Vital Metrics</th>
+                        <th class="p-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Inference Probability</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% if data %}
+                        {% for row in data %}
+                        <tr class="hover:bg-blue-50/30 transition-all group">
+                            <td class="p-6">
+                                <span class="text-slate-300 font-bold text-xs group-hover:text-blue-400 transition-colors">#{{ row[0] }}</span>
+                                <div class="mt-1">
+                                    <span class="text-slate-600 font-black text-xs block leading-tight">{{ row[1].split(' ')[1] }}</span>
+                                    <span class="text-slate-400 font-bold text-[9px] uppercase tracking-tighter">{{ row[1].split(' ')[0] }}</span>
+                                </div>
+                            </td>
+                            <td class="p-6">
+                                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black tracking-tighter uppercase 
+                                    {% if row[2] == 'NSR' %} bg-emerald-50 text-emerald-600 border border-emerald-100
+                                    {% elif row[2] == 'AFib' %} bg-orange-50 text-orange-600 border border-orange-100
+                                    {% else %} bg-rose-50 text-rose-600 border border-rose-100 {% endif %} shadow-sm">
+                                    <span class="w-1.5 h-1.5 rounded-full animate-pulse {% if row[2] == 'NSR' %} bg-emerald-500 {% elif row[2] == 'AFib' %} bg-orange-500 {% else %} bg-rose-500 {% endif %}"></span>
+                                    {{ row[2] }}
+                                </span>
+                            </td>
+                            <td class="p-6">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-[8px] font-black text-slate-300 uppercase leading-none mb-1">HR</span>
+                                        <span class="text-xs font-black text-slate-600 italic">{{ row[6] or '--' }} <span class="text-[8px] text-slate-400 not-italic">BPM</span></span>
+                                    </div>
+                                    <div class="w-px h-6 bg-slate-100"></div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[8px] font-black text-slate-300 uppercase leading-none mb-1">BP</span>
+                                        <span class="text-xs font-black text-slate-600 italic">{{ row[7] or '--' }}/{{ row[8] or '--' }}</span>
+                                    </div>
+                                    <div class="w-px h-6 bg-slate-100"></div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[8px] font-black text-slate-300 uppercase leading-none mb-1">SPO2</span>
+                                        <span class="text-xs font-black text-slate-600 italic">{{ row[9] or '--' }}%</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-6">
+                                <div class="flex items-center justify-center gap-6 text-[9px] font-black">
+                                    <div class="flex flex-col items-center">
+                                        <span class="text-slate-300 uppercase mb-1">NSR</span>
+                                        <span class="text-slate-700 font-black italic">{{ (row[3] * 100) | round(1) }}%</span>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <span class="text-slate-300 uppercase mb-1">AFIB</span>
+                                        <span class="text-slate-700 font-black italic">{{ (row[4] * 100) | round(1) }}%</span>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <span class="text-slate-300 uppercase mb-1">VTCC</span>
+                                        <span class="text-slate-700 font-black italic">{{ (row[5] * 100) | round(1) }}%</span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="p-20 text-center">
+                                <div class="flex flex-col items-center opacity-20 group hover:opacity-40 transition-opacity">
+                                    <i class="fas fa-database text-6xl mb-4 text-slate-400"></i>
+                                    <p class="font-black uppercase tracking-[0.3em] text-xs text-slate-500">Audit Trail is Empty</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

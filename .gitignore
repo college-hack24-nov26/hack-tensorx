@@ -4,3 +4,7 @@
 static/
 model/
 documents/
+routes/__pycache__/
+services/__pycache__/
+__pycache__/
+vectordb/
