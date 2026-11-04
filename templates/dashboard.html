@@ -96,21 +96,6 @@
                 <div id="resultOutput" class="hidden"></div>
             </div>
 
-            <!-- LLM Clinical Analysis Card -->
-            <div id="llmCard" class="hidden bg-white rounded-[2rem] p-8 shadow-2xl shadow-slate-200/50 border border-slate-200 ui-transition">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center shadow-inner"><i class="fas fa-robot text-sm"></i></div>
-                    <div>
-                        <h3 class="text-sm font-black text-slate-800 uppercase tracking-tighter">AI Clinical Analysis</h3>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Llama 4 · Groq</p>
-                    </div>
-                </div>
-                <p id="llmInterpretation" class="text-xs text-slate-600 font-medium leading-relaxed mb-6 border-l-4 border-violet-300 pl-4 italic"></p>
-                <div>
-                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Quick Actions</p>
-                    <ol id="llmSteps" class="space-y-2"></ol>
-                </div>
-            </div>
         </div>
 
         <!-- ECG Strip -->
@@ -136,87 +121,44 @@
             </div>
         </div>
     </div>
-<!-- ═══════════════════════════════════════════════════════════════════
-     LIVE SIMULATOR MONITOR
-     Connects to ECGX /ws/live which bridges the SIMULATOR on port 8002
-════════════════════════════════════════════════════════════════════════ -->
-<div class="mt-8 md:mt-10">
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-    <div>
-      <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tighter italic">Live Simulator Monitor</h2>
-      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Real-time stream from ECG Simulator &rarr; SVC Model inference</p>
-    </div>
-    <!-- Bridge controls -->
-    <div class="flex flex-wrap gap-3 items-center">
-      <input id="sim-host" type="text" placeholder="Simulator IP:8002" value="10.246.13.184:8002"
-        class="border-2 border-slate-200 rounded-xl px-4 py-2 text-sm font-bold outline-none focus:border-blue-500 w-48">
-      <input id="sim-session" type="text" placeholder="Session ID" value=""
-        class="border-2 border-slate-200 rounded-xl px-4 py-2 text-sm font-bold outline-none focus:border-blue-500 w-64">
-      <button onclick="fetchActiveSession()" title="Auto-fetch active session from simulator"
-        class="bg-slate-700 hover:bg-slate-600 text-white font-black px-4 py-2 rounded-xl text-xs uppercase tracking-widest transition-all">
-        <i class="fas fa-sync-alt"></i>
-      </button>
-      <button onclick="startBridge()" id="btn-bridge-start"
-        class="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-5 py-2 rounded-xl text-xs uppercase tracking-widest transition-all">
-        Connect
-      </button>
-      <button onclick="stopBridge()" id="btn-bridge-stop"
-        class="bg-rose-600 hover:bg-rose-700 text-white font-black px-5 py-2 rounded-xl text-xs uppercase tracking-widest transition-all">
-        Disconnect
-      </button>
-      <!-- Status dot -->
-      <div class="flex items-center gap-2">
-        <span id="bridge-dot" class="w-3 h-3 rounded-full bg-slate-300 inline-block"></span>
-        <span id="bridge-label" class="text-xs font-bold text-slate-400 uppercase">Idle</span>
-      </div>
-    </div>
-  </div>
+    <!-- LLM Clinical Analysis — full width, shown after analysis -->
+    <div id="llmCard" class="hidden mt-8 ui-transition">
+        <div class="bg-white rounded-[2rem] border border-slate-200 shadow-2xl shadow-slate-200/50 overflow-hidden">
 
-  <div class="grid grid-cols-1 xl:grid-cols-4 gap-6 items-stretch">
+            <!-- Header bar -->
+            <div class="flex items-center justify-between px-8 py-5 border-b border-slate-100 bg-gradient-to-r from-violet-50 to-white">
+                <div class="flex items-center gap-4">
+                    <div class="w-11 h-11 rounded-2xl bg-violet-100 text-violet-600 flex items-center justify-center shadow-inner text-lg">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black text-slate-800 uppercase tracking-tighter">AI Clinical Analysis</h3>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">openai/gpt-oss-120b &middot; Groq</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-violet-50 border border-violet-100 rounded-xl">
+                    <span class="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse"></span>
+                    <span class="text-[9px] font-black text-violet-500 uppercase tracking-widest">LLM Generated</span>
+                </div>
+            </div>
 
-    <!-- Live ECG canvas -->
-    <div class="xl:col-span-3 bg-white rounded-[2rem] p-4 md:p-8 shadow-2xl shadow-slate-200/50 border border-slate-200">
-      <div class="flex justify-between items-center mb-4">
-        <span class="text-sm font-black text-slate-700 uppercase tracking-tighter">Lead II &mdash; Live Stream</span>
-        <div class="flex items-center gap-2 text-[10px] font-black uppercase">
-          <span id="live-samples-count" class="text-slate-400">0 samples</span>
-          <span id="live-elapsed" class="text-slate-400">0.00 s</span>
-          <span id="live-rhythm-badge" class="px-3 py-1 rounded-lg bg-slate-100 text-slate-500">—</span>
+            <!-- Body -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-0 divide-y lg:divide-y-0 lg:divide-x divide-slate-100">
+
+                <!-- Interpretation -->
+                <div class="lg:col-span-2 p-8">
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-4">Clinical Interpretation</p>
+                    <p id="llmInterpretation" class="text-sm text-slate-700 font-medium leading-relaxed border-l-4 border-violet-300 pl-5 italic"></p>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="p-8">
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-4">Immediate Clinical Steps</p>
+                    <ol id="llmSteps" class="space-y-3"></ol>
+                </div>
+            </div>
         </div>
-      </div>
-      <div style="background:#0d1117;border-radius:1rem;overflow:hidden;position:relative;height:320px;">
-        <canvas id="live-canvas" style="width:100%;height:100%;display:block;"></canvas>
-        <div id="live-idle" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(148,163,184,0.2);pointer-events:none">
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2 12 6 12 8 4 10 20 12 12 14 16 16 12 22 12"/></svg>
-          <p style="font-size:11px;font-weight:900;letter-spacing:0.3em;margin-top:12px">AWAITING STREAM</p>
-        </div>
-      </div>
     </div>
-
-    <!-- Prediction panel -->
-    <div class="xl:col-span-1 flex flex-col gap-4">
-
-      <!-- Prediction result -->
-      <div class="bg-slate-900 rounded-[2rem] p-6 shadow-2xl border border-slate-800 flex-1 flex flex-col justify-center text-center">
-        <p class="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] mb-3">SVC Prediction</p>
-        <div id="live-pred-label" class="text-4xl font-black text-slate-600 uppercase tracking-tighter italic mb-4">—</div>
-        <div id="live-pred-bars" class="space-y-3 text-left px-2"></div>
-        <p id="live-pred-time" class="text-[9px] text-slate-600 mt-4">No prediction yet</p>
-      </div>
-
-      <!-- Stream stats -->
-      <div class="bg-white rounded-[2rem] p-5 shadow-xl border border-slate-200">
-        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Stream Stats</p>
-        <div class="space-y-1">
-          <div class="flex justify-between text-xs"><span class="text-slate-400 font-bold">Session</span><span id="live-stat-session" class="font-black text-slate-700 truncate max-w-[100px]">—</span></div>
-          <div class="flex justify-between text-xs"><span class="text-slate-400 font-bold">Source</span><span id="live-stat-source" class="font-black text-slate-700">—</span></div>
-          <div class="flex justify-between text-xs"><span class="text-slate-400 font-bold">Samples</span><span id="live-stat-samples" class="font-black text-slate-700">0</span></div>
-          <div class="flex justify-between text-xs"><span class="text-slate-400 font-bold">Predictions</span><span id="live-stat-preds" class="font-black text-slate-700">0</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 </div><!-- end max-w container -->
 
@@ -342,7 +284,7 @@ let state = { hasFile: false, hasVitals: false, isAnalyzed: false };
 let batchSignals = {};  // row index -> filtered_signal array
 let lastAnalysisResult = null;
 
-window.onload = function() { loadVitalsFromStorage(); updateClinicalStatus(); fetchActiveSession(); };
+window.onload = function() { loadVitalsFromStorage(); updateClinicalStatus(); };
 
 function saveVitalsToStorage() {
     const vitals = { 
@@ -598,12 +540,13 @@ function renderLLMAnalysis(llm) {
     document.getElementById('llmInterpretation').innerText = llm.interpretation || 'No interpretation available.';
     const steps = document.getElementById('llmSteps');
     steps.innerHTML = (llm.quick_steps || []).map((s, i) =>
-        `<li class="flex gap-3 text-xs text-slate-700 font-medium">
-            <span class="w-5 h-5 rounded-full bg-violet-100 text-violet-600 font-black text-[9px] flex items-center justify-center shrink-0 mt-0.5">${i+1}</span>
-            <span>${s}</span>
+        `<li class="flex gap-3 text-sm text-slate-700 font-medium">
+            <span class="w-6 h-6 rounded-full bg-violet-100 text-violet-600 font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">${i+1}</span>
+            <span class="leading-relaxed">${s}</span>
         </li>`
     ).join('');
     card.classList.remove('hidden');
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function renderBatchResults(results) {
@@ -723,198 +666,7 @@ function renderPlotData(arr, prediction) {
         { responsive: true, displayModeBar: false, scrollZoom: false }
     );
 }
-// ════════════════════════════════════════════════════════════════════════════════
-// LIVE SIMULATOR MONITOR
-// ════════════════════════════════════════════════════════════════════════════════
-const LIVE_WIN = 2500;
-let liveWs = null;
-let liveBuf = new Float32Array(LIVE_WIN);
-let liveBufHead = 0;
-let liveBufFilled = 0;
-let liveAnimFrame = null;
-let livePredCount = 0;
 
-const liveCanvas = document.getElementById('live-canvas');
-const liveCtx = liveCanvas.getContext('2d');
-
-function resizeLiveCanvas() {
-  const container = liveCanvas.parentElement;
-  const dpr = window.devicePixelRatio || 1;
-  const w = container.clientWidth  || 800;
-  const h = container.clientHeight || 320;
-  liveCanvas.width  = w * dpr;
-  liveCanvas.height = h * dpr;
-  liveCanvas.style.width  = w + 'px';
-  liveCanvas.style.height = h + 'px';
-  liveCtx.scale(dpr, dpr);
-}
-
-window.addEventListener('resize', resizeLiveCanvas);
-// Defer until DOM is fully laid out
-window.addEventListener('load', resizeLiveCanvas);
-
-function drawLiveFrame() {
-  const W = liveCanvas.width  / (window.devicePixelRatio || 1);
-  const H = liveCanvas.height / (window.devicePixelRatio || 1);
-  if (!W || !H) return;
-  liveCtx.clearRect(0, 0, W, H);
-
-  // ECG grid
-  const largeW = W / (LIVE_WIN / 25);
-  const largeH = H / 8;
-  liveCtx.strokeStyle = '#1a3a1a'; liveCtx.lineWidth = 0.8;
-  for (let x = 0; x <= W; x += largeW) { liveCtx.beginPath(); liveCtx.moveTo(x,0); liveCtx.lineTo(x,H); liveCtx.stroke(); }
-  for (let y = 0; y <= H; y += largeH) { liveCtx.beginPath(); liveCtx.moveTo(0,y); liveCtx.lineTo(W,y); liveCtx.stroke(); }
-  liveCtx.strokeStyle = '#0d1f0d'; liveCtx.lineWidth = 0.4;
-  for (let x = 0; x <= W; x += largeW/5) { liveCtx.beginPath(); liveCtx.moveTo(x,0); liveCtx.lineTo(x,H); liveCtx.stroke(); }
-  for (let y = 0; y <= H; y += largeH/5) { liveCtx.beginPath(); liveCtx.moveTo(0,y); liveCtx.lineTo(W,y); liveCtx.stroke(); }
-
-  if (liveBufFilled === 0) return;
-  const count = Math.min(liveBufFilled, LIVE_WIN);
-  const start = (liveBufHead - count + LIVE_WIN) % LIVE_WIN;
-  const mid = H / 2, gain = H * 0.35, xStep = W / LIVE_WIN;
-
-  liveCtx.strokeStyle = '#2ecc71'; liveCtx.lineWidth = 1.5;
-  liveCtx.shadowColor = '#2ecc71'; liveCtx.shadowBlur = 3;
-  liveCtx.beginPath();
-  for (let i = 0; i < count; i++) {
-    const s = liveBuf[(start + i) % LIVE_WIN];
-    const x = i * xStep, y = mid - s * gain;
-    i === 0 ? liveCtx.moveTo(x, y) : liveCtx.lineTo(x, y);
-  }
-  liveCtx.stroke();
-  liveCtx.shadowBlur = 0;
-
-  // write cursor
-  const cx = (count / LIVE_WIN) * W;
-  liveCtx.strokeStyle = 'rgba(46,204,113,0.2)'; liveCtx.lineWidth = 2;
-  liveCtx.beginPath(); liveCtx.moveTo(cx, 0); liveCtx.lineTo(cx, H); liveCtx.stroke();
-}
-
-function liveRenderLoop() {
-  drawLiveFrame();
-  liveAnimFrame = requestAnimationFrame(liveRenderLoop);
-}
-
-function setBridgeStatus(status, message) {
-  const dot = document.getElementById('bridge-dot');
-  const lbl = document.getElementById('bridge-label');
-  const colors = { connecting:'#f59e0b', connected:'#10b981', stopped:'#94a3b8', error:'#f43f5e', idle:'#94a3b8' };
-  dot.style.background = colors[status] || '#94a3b8';
-  lbl.textContent = message ? `ERROR: ${message}` : status.toUpperCase();
-  lbl.style.color = status === 'error' ? '#f43f5e' : '';
-}
-
-function updateLivePrediction(p) {
-  if (!p || p.error) return;
-  livePredCount++;
-  const colorMap = { NSR:'#10b981', AFib:'#f59e0b', VTCC:'#f43f5e' };
-  const col = colorMap[p.prediction] || '#94a3b8';
-  document.getElementById('live-pred-label').textContent = p.prediction;
-  document.getElementById('live-pred-label').style.color = col;
-  document.getElementById('live-pred-time').textContent = 'Updated ' + new Date().toLocaleTimeString();
-  document.getElementById('live-stat-preds').textContent = livePredCount;
-
-  const bars = document.getElementById('live-pred-bars');
-  bars.innerHTML = Object.entries(p.probabilities).map(([cls, prob]) => {
-    const c = colorMap[cls] || '#94a3b8';
-    const pct = (prob * 100).toFixed(1);
-    return `<div>
-      <div style="display:flex;justify-content:space-between;font-size:9px;font-weight:900;color:#94a3b8;text-transform:uppercase;margin-bottom:3px">
-        <span>${cls}</span><span>${pct}%</span>
-      </div>
-      <div style="background:#1e293b;height:4px;border-radius:4px;overflow:hidden">
-        <div style="height:100%;width:${pct}%;background:${cls===p.prediction?col:'#334155'};border-radius:4px;transition:width 0.4s"></div>
-      </div>
-    </div>`;
-  }).join('');
-
-  if (p.filtered_signal && p.filtered_signal.length > 0) {
-    renderPlotData(p.filtered_signal, p.prediction);
-    plotLabel.innerText = `LIVE • ${p.prediction} • SVC Model`;
-    plotLabel.className = 'text-[10px] font-black text-emerald-500 uppercase tracking-widest italic animate-pulse';
-  }
-}
-
-function connectLiveWS(onReady) {
-  if (liveWs) { liveWs.close(); liveWs = null; }
-  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-  liveWs = new WebSocket(`${proto}://${location.host}/ws/live`);
-
-  liveWs.onopen = () => {
-    document.getElementById('live-idle').style.display = 'none';
-    if (!liveAnimFrame) liveRenderLoop();
-    if (onReady) onReady();
-  };
-  liveWs.onclose = () => setBridgeStatus('stopped');
-  liveWs.onerror = () => setBridgeStatus('error');
-
-  liveWs.onmessage = (e) => {
-    const msg = JSON.parse(e.data);
-    if (msg.type === 'bridge_status') { setBridgeStatus(msg.status, msg.message); return; }
-    if (msg.type === 'segment') {
-      document.getElementById('live-rhythm-badge').textContent = msg.rhythm || '—';
-      document.getElementById('live-stat-source').textContent = msg.source || '—';
-      return;
-    }
-    if (msg.type === 'live') {
-      for (const s of msg.samples) {
-        liveBuf[liveBufHead] = s;
-        liveBufHead = (liveBufHead + 1) % LIVE_WIN;
-        if (liveBufFilled < LIVE_WIN) liveBufFilled++;
-      }
-      document.getElementById('live-samples-count').textContent = (msg.samples_sent || 0).toLocaleString() + ' samples';
-      document.getElementById('live-elapsed').textContent = (msg.elapsed || 0) + ' s';
-      document.getElementById('live-rhythm-badge').textContent = msg.rhythm || '—';
-      document.getElementById('live-stat-session').textContent = (msg.session_id || '—').slice(0, 8) + '...';
-      document.getElementById('live-stat-source').textContent = msg.source || '—';
-      document.getElementById('live-stat-samples').textContent = (msg.samples_sent || 0).toLocaleString();
-      if (msg.prediction_update) updateLivePrediction(msg.prediction_update);
-    }
-  };
-}
-
-async function fetchActiveSession() {
-  const host = document.getElementById('sim-host').value.trim() || '10.246.13.184:8002';
-  try {
-    const res = await fetch(`/live/active-session?simulator_host=${encodeURIComponent(host)}`);
-    const data = await res.json();
-    if (data.session_id) {
-      document.getElementById('sim-session').value = data.session_id;
-      setBridgeStatus('idle');
-      document.getElementById('bridge-label').textContent = 'SESSION FETCHED';
-    } else {
-      setBridgeStatus('error', 'No active session on simulator');
-    }
-  } catch (e) {
-    setBridgeStatus('error', 'Cannot reach simulator');
-  }
-}
-
-async function startBridge() {
-  const host = document.getElementById('sim-host').value.trim() || `${location.hostname}:8002`;
-  const sid  = document.getElementById('sim-session').value.trim();
-  if (!sid) { alert('Enter a Session ID from the Simulator'); return; }
-
-  liveBuf.fill(0); liveBufHead = 0; liveBufFilled = 0; livePredCount = 0;
-  setBridgeStatus('connecting');
-
-  // Connect WS first, then start bridge only after WS is open
-  connectLiveWS(async () => {
-    await fetch('/live/start', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ simulator_host: host, session_id: sid })
-    });
-  });
-}
-
-async function stopBridge() {
-  await fetch('/live/stop', { method: 'POST' });
-  if (liveWs) { liveWs.close(); liveWs = null; }
-  if (liveAnimFrame) { cancelAnimationFrame(liveAnimFrame); liveAnimFrame = null; }
-  setBridgeStatus('stopped');
-}
 </script>
 
 <style>

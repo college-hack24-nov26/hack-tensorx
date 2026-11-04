@@ -1,106 +1,197 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="max-w-[1200px] mx-auto px-4 md:px-6 py-4 md:py-8 animate-in fade-in slide-in-from-bottom-10 duration-700">
-    <div class="flex flex-col items-center mb-8 text-center">
-        <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter mb-2 uppercase italic text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500">Medical AI Assistant</h1>
-        <p class="text-slate-500 text-sm md:text-base font-medium text-blue-600/60 uppercase tracking-widest text-[10px]">RAG-Powered Clinical Knowledge Base</p>
+<div class="max-w-[1400px] mx-auto px-4 md:px-6 py-4 md:py-8 animate-in fade-in slide-in-from-bottom-10 duration-700">
+
+    <!-- Header -->
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter mb-1 uppercase italic text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500">Medical AI Assistant</h1>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">RAG · FAISS · openai/gpt-oss-20b · Groq</p>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="resetChat()" class="flex items-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-black uppercase tracking-wider transition-all">
+                <i class="fas fa-redo"></i> Reset Chat
+            </button>
+            <button onclick="rebuildVectorDB()" class="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-lg shadow-blue-200">
+                <i class="fas fa-sync-alt"></i> Rebuild Index
+            </button>
+        </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Chat Container -->
-        <div class="lg:col-span-2 bg-white rounded-[2rem] shadow-2xl shadow-slate-200/50 border border-slate-200 flex flex-col" style="height: 700px;">
-            <div class="p-6 border-b border-slate-200 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center shadow-inner">
-                        <i class="fas fa-robot text-sm"></i>
+    <div class="grid grid-cols-1 xl:grid-cols-4 gap-6 items-start">
+
+        <!-- ── Left Sidebar: Patient Context ─────────────────────────────── -->
+        <div class="xl:col-span-1 space-y-4">
+
+            <!-- Patient Context Card -->
+            <div class="bg-white rounded-[2rem] p-6 shadow-2xl shadow-slate-200/50 border border-slate-200">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center shadow-inner"><i class="fas fa-user-injured text-sm"></i></div>
+                        <div>
+                            <h3 class="text-sm font-black text-slate-800 uppercase tracking-tighter">Patient Context</h3>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">From localStorage</p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 class="text-lg font-black text-slate-800 uppercase tracking-tighter">Chat Interface</h2>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Llama 3.3 · 70B · Groq</p>
+                    <button onclick="refreshContext()" title="Refresh from saved profile" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-violet-100 text-slate-400 hover:text-violet-600 flex items-center justify-center transition-all">
+                        <i class="fas fa-sync-alt text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- Patient Info -->
+                <div class="space-y-2 mb-4">
+                    <div class="flex justify-between items-center py-1.5 border-b border-slate-50">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Name</span>
+                        <span id="ctx_name" class="text-xs font-black text-slate-700">—</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1.5 border-b border-slate-50">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Age</span>
+                        <span id="ctx_age" class="text-xs font-black text-slate-700">—</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1.5 border-b border-slate-50">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Blood Group</span>
+                        <span id="ctx_blood" class="text-xs font-black text-slate-700">—</span>
                     </div>
                 </div>
-                <button onclick="resetChat()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">
-                    <i class="fas fa-redo mr-2"></i>Reset
-                </button>
-            </div>
 
-            <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-4">
-                <div class="flex gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-violet-100 text-violet-600 flex items-center justify-center shrink-0">
-                        <i class="fas fa-robot text-xs"></i>
-                    </div>
-                    <div class="bg-slate-50 rounded-2xl rounded-tl-none p-4 max-w-[80%]">
-                        <p class="text-sm text-slate-700 font-medium mb-2">👋 Hello! I'm your specialized medical AI assistant.</p>
-                        <p class="text-xs text-slate-600 leading-relaxed">I can help with:</p>
-                        <ul class="text-xs text-slate-600 mt-2 space-y-1 ml-4">
-                            <li>• ECG interpretation and cardiac rhythm analysis</li>
-                            <li>• Clinical recommendations and treatment protocols</li>
-                            <li>• Differential diagnosis for cardiac conditions</li>
-                            <li>• Medication guidelines and contraindications</li>
-                            <li>• Risk stratification and follow-up planning</li>
-                        </ul>
-                        <p class="text-[10px] text-slate-400 mt-3 italic">Ask me anything about cardiology or clinical practice!</p>
+                <!-- Vitals -->
+                <div class="bg-rose-50 rounded-2xl p-4 border border-rose-100 mb-4">
+                    <p class="text-[9px] font-black text-rose-500 uppercase tracking-widest mb-3"><i class="fas fa-heartbeat mr-1"></i>Vitals</p>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase">HR</span>
+                            <span id="ctx_hr" class="text-xs font-black text-slate-700">— BPM</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase">BP</span>
+                            <span id="ctx_bp" class="text-xs font-black text-slate-700">— / — mmHg</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase">SpO2</span>
+                            <span id="ctx_spo2" class="text-xs font-black text-slate-700">— %</span>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Live ECG Prediction -->
+                <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 mb-5">
+                    <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3"><i class="fas fa-wave-square mr-1"></i>Last ECG Prediction</p>
+                    <div id="ctx_ecg_block" class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-[9px] font-bold text-slate-500 uppercase">Rhythm</span>
+                            <span id="ctx_ecg_pred" class="text-xs font-black text-slate-400">—</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-[9px] font-bold text-slate-500 uppercase">Confidence</span>
+                            <span id="ctx_ecg_conf" class="text-xs font-black text-slate-400">—</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-[9px] font-bold text-slate-500 uppercase">Source</span>
+                            <span id="ctx_ecg_src" class="text-xs font-black text-slate-400">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inject Context Toggle -->
+                <label class="flex items-center gap-3 cursor-pointer select-none">
+                    <div class="relative">
+                        <input type="checkbox" id="injectToggle" class="sr-only" checked>
+                        <div id="toggleBg" class="w-10 h-5 bg-violet-600 rounded-full transition-colors"></div>
+                        <div id="toggleDot" class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-5"></div>
+                    </div>
+                    <span class="text-xs font-black text-slate-700 uppercase tracking-widest">Auto-inject context</span>
+                </label>
+                <p class="text-[9px] text-slate-400 font-medium mt-1 leading-relaxed">When ON, patient vitals and ECG prediction are prepended to every message.</p>
             </div>
 
-            <div class="p-6 border-t border-slate-200">
-                <div class="flex gap-3">
-                    <input type="text" id="chatInput" placeholder="Ask about ECG patterns, cardiac conditions..." 
-                           class="flex-1 bg-slate-50 border-2 border-slate-200 rounded-2xl px-6 py-4 text-sm focus:border-violet-500 focus:bg-white outline-none transition-all"
-                           onkeypress="if(event.key==='Enter') sendMessage()">
-                    <button onclick="sendMessage()" id="sendBtn" class="px-8 py-4 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl font-black uppercase tracking-wider text-sm transition-all active:scale-95 shadow-lg shadow-violet-200">
-                        <i class="fas fa-paper-plane"></i>
+            <!-- Quick Prompts -->
+            <div class="bg-white rounded-[2rem] p-6 shadow-2xl shadow-slate-200/50 border border-slate-200">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shadow-inner"><i class="fas fa-bolt text-sm"></i></div>
+                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-tighter">Quick Prompts</h3>
+                </div>
+                <div class="space-y-2" id="quickPrompts">
+                    <button onclick="quickSend('What are the immediate treatment steps for this ECG finding?')" class="w-full text-left px-4 py-3 bg-slate-50 hover:bg-violet-50 hover:border-violet-200 border border-slate-100 rounded-xl text-[10px] font-bold text-slate-600 hover:text-violet-700 transition-all leading-relaxed">
+                        <i class="fas fa-bolt text-amber-400 mr-2"></i>Immediate treatment steps for this ECG?
+                    </button>
+                    <button onclick="quickSend('What are the defibrillation protocols for this condition?')" class="w-full text-left px-4 py-3 bg-slate-50 hover:bg-violet-50 hover:border-violet-200 border border-slate-100 rounded-xl text-[10px] font-bold text-slate-600 hover:text-violet-700 transition-all leading-relaxed">
+                        <i class="fas fa-bolt text-amber-400 mr-2"></i>Defibrillation protocols?
+                    </button>
+                    <button onclick="quickSend('What medications are indicated based on the current vitals and rhythm?')" class="w-full text-left px-4 py-3 bg-slate-50 hover:bg-violet-50 hover:border-violet-200 border border-slate-100 rounded-xl text-[10px] font-bold text-slate-600 hover:text-violet-700 transition-all leading-relaxed">
+                        <i class="fas fa-bolt text-amber-400 mr-2"></i>Medications indicated for current vitals?
+                    </button>
+                    <button onclick="quickSend('What is the risk stratification for this patient?')" class="w-full text-left px-4 py-3 bg-slate-50 hover:bg-violet-50 hover:border-violet-200 border border-slate-100 rounded-xl text-[10px] font-bold text-slate-600 hover:text-violet-700 transition-all leading-relaxed">
+                        <i class="fas fa-bolt text-amber-400 mr-2"></i>Risk stratification for this patient?
+                    </button>
+                    <button onclick="quickSend('What nursing interventions are recommended for AFib management in the ED?')" class="w-full text-left px-4 py-3 bg-slate-50 hover:bg-violet-50 hover:border-violet-200 border border-slate-100 rounded-xl text-[10px] font-bold text-slate-600 hover:text-violet-700 transition-all leading-relaxed">
+                        <i class="fas fa-bolt text-amber-400 mr-2"></i>Nursing interventions for AFib in ED?
+                    </button>
+                    <button onclick="quickSend('What are the SpO2 thresholds requiring supplemental oxygen?')" class="w-full text-left px-4 py-3 bg-slate-50 hover:bg-violet-50 hover:border-violet-200 border border-slate-100 rounded-xl text-[10px] font-bold text-slate-600 hover:text-violet-700 transition-all leading-relaxed">
+                        <i class="fas fa-bolt text-amber-400 mr-2"></i>SpO2 thresholds for supplemental O2?
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Sidebar -->
-        <div class="space-y-6">
-            <div class="bg-white rounded-[2rem] p-8 shadow-2xl shadow-slate-200/50 border border-slate-200">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shadow-inner">
-                        <i class="fas fa-database text-sm"></i>
+        <!-- ── Chat Panel ──────────────────────────────────────────────────── -->
+        <div class="xl:col-span-3 bg-white rounded-[2rem] shadow-2xl shadow-slate-200/50 border border-slate-200 flex flex-col" style="height:780px;">
+
+            <!-- Chat Header -->
+            <div class="p-6 border-b border-slate-100 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center shadow-inner">
+                        <i class="fas fa-robot text-sm"></i>
                     </div>
-                    <h3 class="text-lg font-black text-slate-800 uppercase tracking-tighter">Knowledge Base</h3>
+                    <div>
+                        <h2 class="text-base font-black text-slate-800 uppercase tracking-tighter">Clinical RAG Assistant</h2>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">openai/gpt-oss-20b · Groq · FAISS · 7 Cardiology Docs</p>
+                    </div>
                 </div>
-                <p class="text-xs text-slate-600 mb-6 leading-relaxed">Vector database built from medical literature and clinical guidelines.</p>
-                <button onclick="rebuildVectorDB()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-blue-200 transition-all active:scale-95 uppercase tracking-widest text-xs">
-                    <i class="fas fa-sync-alt mr-2"></i>Rebuild Index
-                </button>
+                <!-- Context injection status badge -->
+                <div id="contextBadge" class="flex items-center gap-2 px-3 py-1.5 bg-violet-50 border border-violet-100 rounded-xl">
+                    <span class="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse"></span>
+                    <span class="text-[9px] font-black text-violet-600 uppercase tracking-widest">Context Active</span>
+                </div>
             </div>
 
-            <div class="bg-slate-900 rounded-[2rem] p-8 shadow-2xl shadow-slate-900/20 border border-slate-800">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-900 text-emerald-400 flex items-center justify-center shadow-inner">
-                        <i class="fas fa-book-medical text-sm"></i>
+            <!-- Messages -->
+            <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-5 no-scrollbar">
+                <div class="flex gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center shrink-0 mt-1">
+                        <i class="fas fa-robot text-xs"></i>
                     </div>
-                    <h3 class="text-lg font-black text-slate-100 uppercase tracking-tighter">Features</h3>
+                    <div class="bg-slate-50 rounded-2xl rounded-tl-none p-5 max-w-[85%] border border-slate-100">
+                        <p class="text-sm font-bold text-slate-800 mb-2">👋 Hello! I'm your specialized clinical AI assistant.</p>
+                        <p class="text-xs text-slate-500 leading-relaxed mb-3">I'm grounded in 7 cardiology documents covering AFib management, defibrillation protocols, and cardiac arrest guidelines. Enable <span class="font-black text-violet-600">Auto-inject context</span> on the left to automatically include your patient's vitals and ECG prediction in every query.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2 py-1 bg-violet-50 text-violet-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-violet-100">ECG Interpretation</span>
+                            <span class="px-2 py-1 bg-blue-50 text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-blue-100">Treatment Protocols</span>
+                            <span class="px-2 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-emerald-100">Risk Stratification</span>
+                            <span class="px-2 py-1 bg-amber-50 text-amber-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-amber-100">Defibrillation</span>
+                        </div>
+                    </div>
                 </div>
-                <ul class="space-y-3 text-xs text-slate-400">
-                    <li class="flex items-start gap-2">
-                        <i class="fas fa-check-circle text-emerald-400 mt-0.5"></i>
-                        <span>Clinical recommendations</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <i class="fas fa-check-circle text-emerald-400 mt-0.5"></i>
-                        <span>Evidence-based responses</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <i class="fas fa-check-circle text-emerald-400 mt-0.5"></i>
-                        <span>Page-level source tracking</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <i class="fas fa-check-circle text-emerald-400 mt-0.5"></i>
-                        <span>Differential diagnosis support</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <i class="fas fa-check-circle text-emerald-400 mt-0.5"></i>
-                        <span>Risk stratification guidance</span>
-                    </li>
-                </ul>
+            </div>
+
+            <!-- Input -->
+            <div class="p-5 border-t border-slate-100 shrink-0">
+                <!-- Context preview strip -->
+                <div id="contextPreview" class="hidden mb-3 px-4 py-2.5 bg-violet-50 border border-violet-100 rounded-xl flex items-start gap-2">
+                    <i class="fas fa-info-circle text-violet-400 text-xs mt-0.5 shrink-0"></i>
+                    <p id="contextPreviewText" class="text-[9px] font-bold text-violet-600 leading-relaxed"></p>
+                </div>
+                <div class="flex gap-3">
+                    <input type="text" id="chatInput"
+                        placeholder="Ask about ECG patterns, treatment protocols, or this patient's condition..."
+                        class="flex-1 bg-slate-50 border-2 border-slate-200 rounded-2xl px-5 py-4 text-sm focus:border-violet-500 focus:bg-white outline-none transition-all"
+                        onkeypress="if(event.key==='Enter') sendMessage()"
+                        oninput="updateContextPreview()">
+                    <button onclick="sendMessage()" id="sendBtn"
+                        class="px-8 py-4 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl font-black uppercase tracking-wider text-sm transition-all active:scale-95 shadow-lg shadow-violet-200 shrink-0">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -108,13 +199,78 @@
 
 <script>
 const chatMessages = document.getElementById('chatMessages');
-const chatInput = document.getElementById('chatInput');
-const sendBtn = document.getElementById('sendBtn');
+const chatInput    = document.getElementById('chatInput');
+const sendBtn      = document.getElementById('sendBtn');
+const injectToggle = document.getElementById('injectToggle');
 
-let messageHistory = [];
-let historyIndex = -1;
+// ── Toggle UI sync ────────────────────────────────────────────────────────
+injectToggle.addEventListener('change', () => {
+    const on = injectToggle.checked;
+    document.getElementById('toggleBg').style.background  = on ? '#7c3aed' : '#cbd5e1';
+    document.getElementById('toggleDot').style.transform  = on ? 'translateX(20px)' : 'translateX(0)';
+    document.getElementById('contextBadge').style.display = on ? 'flex' : 'none';
+    updateContextPreview();
+});
 
-chatInput.addEventListener('keydown', function(e) {
+// ── Load patient context from localStorage ────────────────────────────────
+function refreshContext() {
+    const v = JSON.parse(localStorage.getItem('tensorx_vitals') || '{}');
+    const e = JSON.parse(localStorage.getItem('tensorx_live_prediction') || '{}');
+
+    document.getElementById('ctx_name').textContent  = v.name  || '—';
+    document.getElementById('ctx_age').textContent   = v.age   ? v.age + ' yrs' : '—';
+    document.getElementById('ctx_blood').textContent = v.blood_group || '—';
+    document.getElementById('ctx_hr').textContent    = v.hr    ? v.hr   + ' BPM'  : '— BPM';
+    document.getElementById('ctx_bp').textContent    = (v.sys && v.dia) ? `${v.sys} / ${v.dia} mmHg` : '— / — mmHg';
+    document.getElementById('ctx_spo2').textContent  = v.spo2  ? v.spo2 + ' %'   : '— %';
+
+    const colMap = { NSR: '#10b981', AFib: '#f59e0b', VTCC: '#f43f5e' };
+    const predEl = document.getElementById('ctx_ecg_pred');
+    predEl.textContent  = e.prediction || '—';
+    predEl.style.color  = colMap[e.prediction] || '#94a3b8';
+    document.getElementById('ctx_ecg_conf').textContent = e.confidence ? e.confidence + '%' : '—';
+    document.getElementById('ctx_ecg_src').textContent  = e.source || '—';
+
+    updateContextPreview();
+}
+
+function buildContextString() {
+    const v = JSON.parse(localStorage.getItem('tensorx_vitals') || '{}');
+    const e = JSON.parse(localStorage.getItem('tensorx_live_prediction') || '{}');
+    const parts = [];
+    if (v.name)  parts.push(`Patient: ${v.name}${v.age ? ', ' + v.age + ' yrs' : ''}${v.blood_group ? ', ' + v.blood_group : ''}`);
+    if (v.hr || v.sys || v.spo2) {
+        const vitals = [];
+        if (v.hr)            vitals.push(`HR ${v.hr} BPM`);
+        if (v.sys && v.dia)  vitals.push(`BP ${v.sys}/${v.dia} mmHg`);
+        if (v.spo2)          vitals.push(`SpO2 ${v.spo2}%`);
+        parts.push('Vitals: ' + vitals.join(', '));
+    }
+    if (e.prediction) {
+        let ecgStr = `ECG: ${e.prediction}`;
+        if (e.confidence) ecgStr += ` (${e.confidence}% confidence)`;
+        if (e.source)     ecgStr += ` — source: ${e.source}`;
+        parts.push(ecgStr);
+    }
+    return parts.join(' | ');
+}
+
+function updateContextPreview() {
+    const preview = document.getElementById('contextPreview');
+    const previewText = document.getElementById('contextPreviewText');
+    if (!injectToggle.checked) { preview.classList.add('hidden'); return; }
+    const ctx = buildContextString();
+    if (ctx) {
+        previewText.textContent = 'Context: ' + ctx;
+        preview.classList.remove('hidden');
+    } else {
+        preview.classList.add('hidden');
+    }
+}
+
+// ── Message history navigation ────────────────────────────────────────────
+let messageHistory = [], historyIndex = -1;
+chatInput.addEventListener('keydown', e => {
     if (e.key === 'ArrowUp') {
         e.preventDefault();
         if (messageHistory.length > 0) {
@@ -126,39 +282,31 @@ chatInput.addEventListener('keydown', function(e) {
         e.preventDefault();
         if (historyIndex !== -1) {
             historyIndex++;
-            if (historyIndex >= messageHistory.length) {
-                historyIndex = -1;
-                chatInput.value = '';
-            } else {
-                chatInput.value = messageHistory[historyIndex];
-            }
+            if (historyIndex >= messageHistory.length) { historyIndex = -1; chatInput.value = ''; }
+            else chatInput.value = messageHistory[historyIndex];
         }
     }
 });
 
+// ── Send ──────────────────────────────────────────────────────────────────
 async function sendMessage() {
-    const message = chatInput.value.trim();
-    if (!message) return;
+    const raw = chatInput.value.trim();
+    if (!raw) return;
 
-    // Add to history
-    messageHistory.push(message);
-    historyIndex = -1;
+    messageHistory.push(raw); historyIndex = -1;
 
-    addUserMessage(message);
+    const ctx = injectToggle.checked ? buildContextString() : '';
+    const fullMessage = ctx ? `[Patient Context: ${ctx}]\n\n${raw}` : raw;
+
+    addUserMessage(raw, ctx);
     chatInput.value = '';
     sendBtn.disabled = true;
     sendBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
 
     try {
-        const res = await fetch('/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message })
-        });
+        const res  = await fetch('/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: fullMessage }) });
         const data = await res.json();
-        
         if (!res.ok) throw new Error(data.detail);
-        
         addBotMessage(data.answer, data.sources);
     } catch (err) {
         addBotMessage('Error: ' + err.message, []);
@@ -168,17 +316,25 @@ async function sendMessage() {
     }
 }
 
-function addUserMessage(text) {
+function quickSend(text) {
+    chatInput.value = text;
+    updateContextPreview();
+    sendMessage();
+}
+
+// ── Render messages ───────────────────────────────────────────────────────
+function addUserMessage(text, ctx) {
     const div = document.createElement('div');
     div.className = 'flex gap-3 justify-end';
+    const ctxBadge = ctx ? `<div class="mb-2 px-2 py-1 bg-violet-700/30 rounded-lg text-[8px] font-black text-violet-200 uppercase tracking-widest"><i class="fas fa-user-injured mr-1"></i>Context injected</div>` : '';
     div.innerHTML = `
         <div class="bg-violet-600 text-white rounded-2xl rounded-tr-none p-4 max-w-[80%]">
-            <p class="text-sm">${escapeHtml(text)}</p>
+            ${ctxBadge}
+            <p class="text-sm leading-relaxed">${escapeHtml(text)}</p>
         </div>
-        <div class="w-8 h-8 rounded-lg bg-slate-200 text-slate-600 flex items-center justify-center shrink-0">
+        <div class="w-8 h-8 rounded-xl bg-slate-200 text-slate-600 flex items-center justify-center shrink-0 mt-1">
             <i class="fas fa-user text-xs"></i>
-        </div>
-    `;
+        </div>`;
     chatMessages.appendChild(div);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
@@ -186,97 +342,69 @@ function addUserMessage(text) {
 function addBotMessage(text, sources) {
     const div = document.createElement('div');
     div.className = 'flex gap-3';
-    
+
     let sourcesHtml = '';
     if (sources && sources.length > 0) {
-        // Group sources by filename
         const grouped = {};
         sources.forEach(s => {
-            const fname = s.filename || 'Unknown';
-            if (!grouped[fname]) grouped[fname] = [];
-            if (s.page && !grouped[fname].includes(s.page)) {
-                grouped[fname].push(s.page);
-            }
+            const f = s.filename || 'Unknown';
+            if (!grouped[f]) grouped[f] = [];
+            if (s.page && !grouped[f].includes(s.page)) grouped[f].push(s.page);
         });
-        
         sourcesHtml = `
-            <div class="mt-3 pt-3 border-t border-slate-200">
-                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2"><i class="fas fa-bookmark mr-1"></i>References:</p>
-                <div class="space-y-1">
+            <div class="mt-4 pt-4 border-t border-slate-200">
+                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2"><i class="fas fa-bookmark mr-1 text-violet-400"></i>References</p>
+                <div class="space-y-1.5">
                 ${Object.entries(grouped).map(([fname, pages]) => {
-                    const pageStr = pages.length > 0 ? ` (pg. ${pages.sort((a,b) => a-b).join(', ')})` : '';
-                    return `<p class="text-[10px] text-slate-600 flex items-start gap-2">
-                        <i class="fas fa-file-pdf text-rose-400 mt-0.5"></i>
-                        <span><span class="font-bold">${fname}</span>${pageStr}</span>
-                    </p>`;
+                    const pg = pages.length ? ` · pg. ${pages.sort((a,b)=>a-b).join(', ')}` : '';
+                    return `<div class="flex items-start gap-2">
+                        <i class="fas fa-file-pdf text-rose-400 text-[10px] mt-0.5 shrink-0"></i>
+                        <p class="text-[10px] text-slate-600 leading-snug"><span class="font-bold">${fname}</span><span class="text-slate-400">${pg}</span></p>
+                    </div>`;
                 }).join('')}
                 </div>
-            </div>
-        `;
+            </div>`;
     }
-    
+
     div.innerHTML = `
-        <div class="w-8 h-8 rounded-lg bg-violet-100 text-violet-600 flex items-center justify-center shrink-0">
+        <div class="w-8 h-8 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center shrink-0 mt-1">
             <i class="fas fa-robot text-xs"></i>
         </div>
-        <div class="bg-slate-50 rounded-2xl rounded-tl-none p-4 max-w-[80%]">
+        <div class="bg-slate-50 rounded-2xl rounded-tl-none p-5 max-w-[85%] border border-slate-100">
             <div class="prose-chat">${marked.parse(text)}</div>
             ${sourcesHtml}
-        </div>
-    `;
+        </div>`;
     chatMessages.appendChild(div);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
+// ── Reset / Rebuild ───────────────────────────────────────────────────────
 async function resetChat() {
     if (!confirm('Clear conversation history?')) return;
-    
     try {
         await fetch('/chat/reset', { method: 'POST' });
-        chatMessages.innerHTML = `
-            <div class="flex gap-3">
-                <div class="w-8 h-8 rounded-lg bg-violet-100 text-violet-600 flex items-center justify-center shrink-0">
-                    <i class="fas fa-robot text-xs"></i>
-                </div>
-                <div class="bg-slate-50 rounded-2xl rounded-tl-none p-4 max-w-[80%]">
-                    <p class="text-sm text-slate-700 font-medium mb-2">👋 Hello! I'm your specialized medical AI assistant.</p>
-                    <p class="text-xs text-slate-600 leading-relaxed">I can help with:</p>
-                    <ul class="text-xs text-slate-600 mt-2 space-y-1 ml-4">
-                        <li>• ECG interpretation and cardiac rhythm analysis</li>
-                        <li>• Clinical recommendations and treatment protocols</li>
-                        <li>• Differential diagnosis for cardiac conditions</li>
-                        <li>• Medication guidelines and contraindications</li>
-                        <li>• Risk stratification and follow-up planning</li>
-                    </ul>
-                    <p class="text-[10px] text-slate-400 mt-3 italic">Ask me anything about cardiology or clinical practice!</p>
-                </div>
-            </div>
-        `;
-    } catch (err) {
-        alert('Error resetting chat: ' + err.message);
-    }
+        chatMessages.innerHTML = '';
+        addBotMessage('Chat history cleared. How can I help you?', []);
+    } catch (err) { alert('Error: ' + err.message); }
 }
 
 async function rebuildVectorDB() {
     if (!confirm('Rebuild vector database? This may take a few minutes.')) return;
-    
     try {
-        const res = await fetch('/chat/rebuild', { method: 'POST' });
+        const res  = await fetch('/chat/rebuild', { method: 'POST' });
         const data = await res.json();
-        if (!res.ok) {
-            throw new Error(data.detail || 'Unknown error occurred');
-        }
+        if (!res.ok) throw new Error(data.detail);
         alert(data.message);
-    } catch (err) {
-        console.error('Rebuild error:', err);
-        alert('Error rebuilding database: ' + (err.message || 'Unknown error'));
-    }
+    } catch (err) { alert('Error rebuilding: ' + err.message); }
 }
 
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
+function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+// ── Init ──────────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+    refreshContext();
+    // Poll localStorage every 3s to pick up live ECG predictions from live.html
+    setInterval(refreshContext, 3000);
+});
 </script>
 {% endblock %}

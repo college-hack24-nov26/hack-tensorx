@@ -1,148 +1,444 @@
-{% extends "base.html" %}
-
-{% block content %}
-<div class="max-w-[1600px] mx-auto px-4 md:px-6 py-4 md:py-6 animate-in fade-in duration-500">
-
+{% extends "base.html" %} {% block content %}
+<div
+  class="max-w-[1600px] mx-auto px-4 md:px-6 py-4 md:py-6 animate-in fade-in duration-500"
+>
   <!-- Emergency Alert Banner -->
-  <div id="alert-banner" class="hidden mb-4 rounded-2xl border-2 p-4 flex items-start gap-4 shadow-xl animate-pulse" style="background:#fff1f2;border-color:#f43f5e;">
-    <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white text-lg" style="background:#f43f5e;">
+  <div
+    id="alert-banner"
+    class="hidden mb-4 rounded-2xl border-2 p-4 flex items-start gap-4 shadow-xl animate-pulse"
+    style="background: #fff1f2; border-color: #f43f5e"
+  >
+    <div
+      class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white text-lg"
+      style="background: #f43f5e"
+    >
       <i class="fas fa-exclamation-triangle"></i>
     </div>
     <div class="flex-1">
-      <p class="text-sm font-black text-rose-700 uppercase tracking-widest mb-0.5" id="alert-title">CRITICAL DETECTION</p>
+      <p
+        class="text-sm font-black text-rose-700 uppercase tracking-widest mb-0.5"
+        id="alert-title"
+      >
+        CRITICAL DETECTION
+      </p>
       <p class="text-xs text-rose-600 font-medium" id="alert-body"></p>
       <div class="flex gap-3 mt-2">
-        <span id="alert-esp" class="hidden text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg bg-rose-100 text-rose-600 border border-rose-200">
+        <span
+          id="alert-esp"
+          class="hidden text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg bg-rose-100 text-rose-600 border border-rose-200"
+        >
           <i class="fas fa-microchip mr-1"></i>ESP32 Triggered
         </span>
-        <span id="alert-n8n" class="hidden text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg bg-rose-100 text-rose-600 border border-rose-200">
+        <span
+          id="alert-n8n"
+          class="hidden text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg bg-rose-100 text-rose-600 border border-rose-200"
+        >
           <i class="fas fa-satellite-dish mr-1"></i>n8n Webhook Fired
         </span>
       </div>
     </div>
-    <button onclick="document.getElementById('alert-banner').classList.add('hidden')" class="text-rose-400 hover:text-rose-700 transition-colors text-lg shrink-0">
+    <button
+      onclick="document.getElementById('alert-banner').classList.add('hidden')"
+      class="text-rose-400 hover:text-rose-700 transition-colors text-lg shrink-0"
+    >
       <i class="fas fa-times"></i>
     </button>
   </div>
 
   <!-- Header -->
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+  <div
+    class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6"
+  >
     <div>
-      <h1 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tighter uppercase italic">Live ECG Monitor</h1>
-      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Real-time stream · SVC inference every 1s · 250Hz</p>
+      <h1
+        class="text-3xl md:text-4xl font-black text-slate-900 tracking-tighter uppercase italic"
+      >
+        Live ECG Monitor
+      </h1>
+      <p
+        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1"
+      >
+        Real-time stream · SVC inference every 1s · 250Hz
+      </p>
     </div>
     <!-- Connection Controls -->
     <div class="flex flex-wrap gap-3 items-center">
-      <input id="sim-host" type="text" value="10.246.13.184:8002" placeholder="Simulator IP:Port"
-        class="border-2 border-slate-200 rounded-xl px-4 py-2 text-sm font-bold outline-none focus:border-blue-500 w-44">
-      <input id="sim-session" type="text" placeholder="Session ID (auto-fetched)"
-        class="border-2 border-slate-200 rounded-xl px-4 py-2 text-sm font-bold outline-none focus:border-blue-500 w-56">
-      <button onclick="fetchAndConnect()" id="btn-connect"
-        class="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-6 py-2 rounded-xl text-xs uppercase tracking-widest transition-all flex items-center gap-2">
+      <input
+        id="sim-host"
+        type="text"
+        value="10.246.13.24:8002"
+        placeholder="Simulator IP:Port"
+        class="border-2 border-slate-200 rounded-xl px-4 py-2 text-sm font-bold outline-none focus:border-blue-500 w-44"
+      />
+      <input
+        id="sim-session"
+        type="text"
+        placeholder="Session ID (auto-fetched)"
+        class="border-2 border-slate-200 rounded-xl px-4 py-2 text-sm font-bold outline-none focus:border-blue-500 w-56"
+      />
+      <button
+        onclick="fetchAndConnect()"
+        id="btn-connect"
+        class="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-6 py-2 rounded-xl text-xs uppercase tracking-widest transition-all flex items-center gap-2"
+      >
         <i class="fas fa-plug"></i> Connect
       </button>
-      <button onclick="disconnect()" id="btn-disconnect"
-        class="bg-rose-600 hover:bg-rose-700 text-white font-black px-6 py-2 rounded-xl text-xs uppercase tracking-widest transition-all flex items-center gap-2">
+      <button
+        onclick="disconnect()"
+        id="btn-disconnect"
+        class="bg-rose-600 hover:bg-rose-700 text-white font-black px-6 py-2 rounded-xl text-xs uppercase tracking-widest transition-all flex items-center gap-2"
+      >
         <i class="fas fa-times"></i> Disconnect
       </button>
-      <div class="flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-xl border border-slate-200">
-        <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
-        <span id="status-label" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Idle</span>
+      <div
+        class="flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-xl border border-slate-200"
+      >
+        <span
+          id="status-dot"
+          class="w-2.5 h-2.5 rounded-full bg-slate-300"
+        ></span>
+        <span
+          id="status-label"
+          class="text-[10px] font-black text-slate-400 uppercase tracking-widest"
+          >Idle</span
+        >
       </div>
     </div>
   </div>
 
-  <!-- Top Stats Bar -->
-  <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-    <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col">
-      <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Samples Received</span>
-      <span id="stat-samples" class="text-xl font-black text-slate-700 tracking-tighter">0</span>
+  <!-- Vitals Display Row -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div
+      class="bg-white p-5 rounded-[1.5rem] border border-slate-200 shadow-xl shadow-slate-200/30 flex items-center gap-4 hover:border-rose-200 ui-transition"
+    >
+      <div
+        class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center text-xl shadow-inner"
+      >
+        <i class="fas fa-heartbeat"></i>
+      </div>
+      <div>
+        <span
+          class="block text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5"
+          >Heart Rate</span
+        >
+        <span id="vital_hr" class="text-2xl font-black text-slate-800 italic"
+          >--
+          <span class="text-xs text-slate-300 not-italic uppercase"
+            >Bpm</span
+          ></span
+        >
+      </div>
     </div>
-    <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col">
-      <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Elapsed</span>
-      <span id="stat-elapsed" class="text-xl font-black text-slate-700 tracking-tighter">0s</span>
+    <div
+      class="bg-white p-5 rounded-[1.5rem] border border-slate-200 shadow-xl shadow-slate-200/30 flex items-center gap-4 hover:border-blue-200 ui-transition"
+    >
+      <div
+        class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-xl shadow-inner"
+      >
+        <i class="fas fa-tint"></i>
+      </div>
+      <div>
+        <span
+          class="block text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5"
+          >BP (Sys/Dia)</span
+        >
+        <span id="vital_bp" class="text-2xl font-black text-slate-800 italic"
+          >-- / --</span
+        >
+      </div>
     </div>
-    <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col">
-      <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Predictions Made</span>
-      <span id="stat-preds" class="text-xl font-black text-slate-700 tracking-tighter">0</span>
+    <div
+      class="bg-white p-5 rounded-[1.5rem] border border-slate-200 shadow-xl shadow-slate-200/30 flex items-center gap-4 hover:border-emerald-200 ui-transition"
+    >
+      <div
+        class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl shadow-inner"
+      >
+        <i class="fas fa-wind"></i>
+      </div>
+      <div>
+        <span
+          class="block text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5"
+          >SpO2 Level</span
+        >
+        <span id="vital_spo2" class="text-2xl font-black text-slate-800 italic"
+          >-- <span class="text-xs text-slate-300 not-italic">%</span></span
+        >
+      </div>
+    </div>
+    <button
+      onclick="openVitalsModal()"
+      class="bg-white p-5 rounded-[1.5rem] border-2 border-dashed border-slate-200 shadow-xl shadow-slate-200/30 flex items-center gap-4 hover:border-violet-400 hover:bg-violet-50 ui-transition w-full text-left"
+    >
+      <div
+        class="w-12 h-12 rounded-2xl bg-violet-50 text-violet-500 flex items-center justify-center text-xl shadow-inner"
+      >
+        <i class="fas fa-user-injured"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <span
+          class="block text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5"
+          >Patient Profile</span
+        >
+        <span
+          id="vital_name"
+          class="text-sm font-black text-slate-700 truncate block"
+          >Tap to set</span
+        >
+      </div>
+    </button>
+  </div>
+
+  <!-- Stream Stats Bar -->
+  <div class="grid grid-cols-3 gap-3 mb-6">
+    <div
+      class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col"
+    >
+      <span
+        class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1"
+        >Samples Received</span
+      >
+      <span
+        id="stat-samples"
+        class="text-xl font-black text-slate-700 tracking-tighter"
+        >0</span
+      >
+    </div>
+    <div
+      class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col"
+    >
+      <span
+        class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1"
+        >Elapsed</span
+      >
+      <span
+        id="stat-elapsed"
+        class="text-xl font-black text-slate-700 tracking-tighter"
+        >0s</span
+      >
+    </div>
+    <div
+      class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col"
+    >
+      <span
+        class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1"
+        >Predictions Made</span
+      >
+      <span
+        id="stat-preds"
+        class="text-xl font-black text-slate-700 tracking-tighter"
+        >0</span
+      >
     </div>
   </div>
 
   <!-- Main Grid -->
   <div class="grid grid-cols-1 xl:grid-cols-4 gap-6 items-start">
-
     <!-- ECG Canvas (3/4 width) -->
     <div class="xl:col-span-3 space-y-6">
-
       <!-- Live Canvas -->
-      <div class="bg-white rounded-[2rem] p-6 shadow-2xl shadow-slate-200/50 border border-slate-200">
+      <div
+        class="bg-white rounded-[2rem] p-6 shadow-2xl shadow-slate-200/50 border border-slate-200"
+      >
         <div class="flex justify-between items-center mb-4">
           <div>
-            <h2 class="text-base font-black text-slate-800 uppercase tracking-tighter">Lead II — Live Stream</h2>
-            <p id="canvas-label" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Awaiting stream...</p>
+            <h2
+              class="text-base font-black text-slate-800 uppercase tracking-tighter"
+            >
+              Lead II — Live Stream
+            </h2>
+            <p
+              id="canvas-label"
+              class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5"
+            >
+              Awaiting stream...
+            </p>
           </div>
           <div class="flex items-center gap-3">
-            <span id="live-bpm" class="text-xs font-black text-rose-500 uppercase hidden">
-              <i class="fas fa-heartbeat mr-1"></i><span id="bpm-val">—</span> BPM
+            <span
+              id="live-bpm"
+              class="text-xs font-black text-rose-500 uppercase hidden"
+            >
+              <i class="fas fa-heartbeat mr-1"></i
+              ><span id="bpm-val">—</span> BPM
             </span>
-            <div id="live-badge" class="hidden items-center gap-2 px-3 py-1.5 bg-rose-50 text-rose-600 rounded-xl text-[9px] font-black border border-rose-100 uppercase">
-              <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span> LIVE
+            <div
+              id="live-badge"
+              class="hidden items-center gap-2 px-3 py-1.5 bg-rose-50 text-rose-600 rounded-xl text-[9px] font-black border border-rose-100 uppercase"
+            >
+              <span
+                class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"
+              ></span>
+              LIVE
             </div>
           </div>
         </div>
-        <div style="background:#0d1117;border-radius:1rem;overflow:hidden;position:relative;height:340px;">
-          <canvas id="live-canvas" style="width:100%;height:100%;display:block;"></canvas>
-          <div id="canvas-idle" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(148,163,184,0.15);pointer-events:none;">
-            <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polyline points="2 12 6 12 8 4 10 20 12 12 14 16 16 12 22 12"/></svg>
-            <p style="font-size:10px;font-weight:900;letter-spacing:0.4em;margin-top:14px;">AWAITING STREAM</p>
+        <div
+          style="
+            background: #0d1117;
+            border-radius: 1rem;
+            overflow: hidden;
+            position: relative;
+            height: 340px;
+          "
+        >
+          <canvas
+            id="live-canvas"
+            style="width: 100%; height: 100%; display: block"
+          ></canvas>
+          <div
+            id="canvas-idle"
+            style="
+              position: absolute;
+              inset: 0;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              color: rgba(148, 163, 184, 0.15);
+              pointer-events: none;
+            "
+          >
+            <svg
+              width="72"
+              height="72"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.2"
+            >
+              <polyline points="2 12 6 12 8 4 10 20 12 12 14 16 16 12 22 12" />
+            </svg>
+            <p
+              style="
+                font-size: 10px;
+                font-weight: 900;
+                letter-spacing: 0.4em;
+                margin-top: 14px;
+              "
+            >
+              AWAITING STREAM
+            </p>
           </div>
         </div>
       </div>
 
       <!-- Prediction History Timeline -->
-      <div class="bg-white rounded-[2rem] p-6 shadow-2xl shadow-slate-200/50 border border-slate-200">
+      <div
+        class="bg-white rounded-[2rem] p-6 shadow-2xl shadow-slate-200/50 border border-slate-200"
+      >
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-base font-black text-slate-800 uppercase tracking-tighter">Prediction Timeline</h2>
-          <button onclick="clearHistory()" class="text-[9px] font-black text-slate-400 hover:text-rose-500 uppercase tracking-widest transition-colors">
+          <h2
+            class="text-base font-black text-slate-800 uppercase tracking-tighter"
+          >
+            Prediction Timeline
+          </h2>
+          <button
+            onclick="clearHistory()"
+            class="text-[9px] font-black text-slate-400 hover:text-rose-500 uppercase tracking-widest transition-colors"
+          >
             <i class="fas fa-trash-alt mr-1"></i>Clear
           </button>
         </div>
-        <div id="pred-timeline" class="flex gap-1.5 flex-wrap min-h-[48px] items-center">
-          <p class="text-[10px] text-slate-300 font-bold uppercase tracking-widest">Predictions will appear here every second...</p>
+        <div
+          id="pred-timeline"
+          class="flex gap-1.5 flex-wrap min-h-[48px] items-center"
+        >
+          <p
+            class="text-[10px] text-slate-300 font-bold uppercase tracking-widest"
+          >
+            Predictions will appear here every second...
+          </p>
         </div>
       </div>
     </div>
 
     <!-- Right Panel (1/4 width) -->
     <div class="xl:col-span-1 space-y-4">
-
       <!-- Current Prediction -->
-      <div id="pred-card" class="bg-slate-900 rounded-[2rem] p-6 shadow-2xl border border-slate-800 text-center">
-        <p class="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4">SVC Prediction</p>
-        <div id="pred-label" class="text-5xl font-black text-slate-600 uppercase tracking-tighter italic mb-2">—</div>
-        <div id="pred-confidence" class="text-[10px] font-black text-slate-600 mb-5">—</div>
+      <div
+        id="pred-card"
+        class="bg-slate-900 rounded-[2rem] p-6 shadow-2xl border border-slate-800 text-center"
+      >
+        <p
+          class="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4"
+        >
+          SVC Prediction
+        </p>
+        <div
+          id="pred-label"
+          class="text-5xl font-black text-slate-600 uppercase tracking-tighter italic mb-2"
+        >
+          —
+        </div>
+        <div
+          id="pred-confidence"
+          class="text-[10px] font-black text-slate-600 mb-5"
+        >
+          —
+        </div>
         <div id="pred-bars" class="space-y-3 text-left"></div>
-        <p id="pred-time" class="text-[8px] text-slate-600 mt-4 uppercase tracking-widest">No prediction yet</p>
+        <p
+          id="pred-time"
+          class="text-[8px] text-slate-600 mt-4 uppercase tracking-widest"
+        >
+          No prediction yet
+        </p>
       </div>
 
       <!-- Alert Log -->
-      <div class="bg-white rounded-[2rem] p-5 shadow-xl border border-slate-200">
+      <div
+        class="bg-white rounded-[2rem] p-5 shadow-xl border border-slate-200"
+      >
         <div class="flex justify-between items-center mb-3">
-          <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Alert Log</p>
-          <button onclick="document.getElementById('alert-log').innerHTML='<p class=\'text-[9px] text-slate-300 font-bold\'>No alerts yet</p>'" class="text-[9px] text-slate-300 hover:text-rose-400 font-black uppercase">Clear</button>
+          <p
+            class="text-[9px] font-black text-slate-400 uppercase tracking-widest"
+          >
+            Alert Log
+          </p>
+          <button
+            onclick="
+              document.getElementById('alert-log').innerHTML =
+                '<p class=\'text-[9px] text-slate-300 font-bold\'>No alerts yet</p>'
+            "
+            class="text-[9px] text-slate-300 hover:text-rose-400 font-black uppercase"
+          >
+            Clear
+          </button>
         </div>
-        <div id="alert-log" class="space-y-2 max-h-[180px] overflow-y-auto no-scrollbar">
+        <div
+          id="alert-log"
+          class="space-y-2 max-h-[180px] overflow-y-auto no-scrollbar"
+        >
           <p class="text-[9px] text-slate-300 font-bold">No alerts yet</p>
         </div>
       </div>
 
       <!-- Session Info -->
-      <div class="bg-white rounded-[2rem] p-5 shadow-xl border border-slate-200">
-        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Session Info</p>
+      <div
+        class="bg-white rounded-[2rem] p-5 shadow-xl border border-slate-200"
+      >
+        <p
+          class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3"
+        >
+          Session Info
+        </p>
         <div class="space-y-1.5 text-xs">
-          <div class="flex justify-between"><span class="text-slate-400 font-bold">Session ID</span><span id="info-session" class="font-black text-slate-700 truncate max-w-[100px]">—</span></div>
-          <div class="flex justify-between"><span class="text-slate-400 font-bold">Host</span><span id="info-host" class="font-black text-slate-700">—</span></div>
-          <div class="flex justify-between"><span class="text-slate-400 font-bold">Segment</span><span id="info-segment" class="font-black text-slate-700">—</span></div>
+          <div class="flex justify-between">
+            <span class="text-slate-400 font-bold">Session ID</span
+            ><span
+              id="info-session"
+              class="font-black text-slate-700 truncate max-w-[100px]"
+              >—</span
+            >
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400 font-bold">Host</span
+            ><span id="info-host" class="font-black text-slate-700">—</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400 font-bold">Segment</span
+            ><span id="info-segment" class="font-black text-slate-700">—</span>
+          </div>
         </div>
       </div>
     </div>
@@ -150,283 +446,689 @@
 </div>
 
 <script>
-const LIVE_WIN = 2500;
-let liveWs = null;
-let liveBuf = new Float32Array(LIVE_WIN);
-let liveBufHead = 0, liveBufFilled = 0;
-let liveAnimFrame = null;
-let predCount = 0;
-let currentPrediction = '—';
-let timelineData = [];
+  const LIVE_WIN = 2500;
+  let liveWs = null;
+  let liveBuf = new Float32Array(LIVE_WIN);
+  let liveBufHead = 0,
+    liveBufFilled = 0;
+  let liveAnimFrame = null;
+  let predCount = 0;
+  let currentPrediction = "—";
+  let timelineData = [];
 
-const canvas = document.getElementById('live-canvas');
-const ctx = canvas.getContext('2d');
+  const canvas = document.getElementById("live-canvas");
+  const ctx = canvas.getContext("2d");
 
-// ── Canvas resize ──────────────────────────────────────────────────────────
-function resizeCanvas() {
-  const dpr = window.devicePixelRatio || 1;
-  const w = canvas.parentElement.clientWidth || 900;
-  const h = canvas.parentElement.clientHeight || 340;
-  canvas.width = w * dpr; canvas.height = h * dpr;
-  canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
-  ctx.scale(dpr, dpr);
-}
-window.addEventListener('resize', resizeCanvas);
-window.addEventListener('load', resizeCanvas);
-
-// ── Draw frame ─────────────────────────────────────────────────────────────
-function drawFrame() {
-  const dpr = window.devicePixelRatio || 1;
-  const W = canvas.width / dpr, H = canvas.height / dpr;
-  ctx.clearRect(0, 0, W, H);
-
-  // ECG paper grid
-  const gW = W / 100, gH = H / 8;
-  ctx.strokeStyle = '#1a3a1a'; ctx.lineWidth = 0.7;
-  for (let x = 0; x <= W; x += gW * 5) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-  for (let y = 0; y <= H; y += gH)     { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
-  ctx.strokeStyle = '#0d1f0d'; ctx.lineWidth = 0.3;
-  for (let x = 0; x <= W; x += gW)     { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-  for (let y = 0; y <= H; y += gH/5)   { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
-
-  if (liveBufFilled === 0) return;
-  const count = Math.min(liveBufFilled, LIVE_WIN);
-  const start = (liveBufHead - count + LIVE_WIN) % LIVE_WIN;
-  const mid = H / 2, gain = H * 0.32, xStep = W / LIVE_WIN;
-
-  // Line color follows current prediction
-  const colMap = { NSR: '#2ecc71', AFib: '#f59e0b', VTCC: '#f43f5e' };
-  const lineColor = colMap[currentPrediction] || '#2ecc71';
-
-  ctx.strokeStyle = lineColor; ctx.lineWidth = 1.5;
-  ctx.shadowColor = lineColor; ctx.shadowBlur = 4;
-  ctx.beginPath();
-  for (let i = 0; i < count; i++) {
-    const s = liveBuf[(start + i) % LIVE_WIN];
-    const x = i * xStep, y = mid - s * gain;
-    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  // ── Canvas resize ──────────────────────────────────────────────────────────
+  function resizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvas.parentElement.clientWidth || 900;
+    const h = canvas.parentElement.clientHeight || 340;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+    ctx.scale(dpr, dpr);
   }
-  ctx.stroke();
-  ctx.shadowBlur = 0;
+  window.addEventListener("resize", resizeCanvas);
+  window.addEventListener("load", resizeCanvas);
 
-  // Write cursor
-  const cx = (count / LIVE_WIN) * W;
-  ctx.strokeStyle = lineColor.replace(')', ',0.15)').replace('rgb', 'rgba');
-  ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
-}
+  // ── Draw frame ─────────────────────────────────────────────────────────────
+  function drawFrame() {
+    const dpr = window.devicePixelRatio || 1;
+    const W = canvas.width / dpr,
+      H = canvas.height / dpr;
+    ctx.clearRect(0, 0, W, H);
 
-function renderLoop() { drawFrame(); liveAnimFrame = requestAnimationFrame(renderLoop); }
+    // ECG paper grid
+    const gW = W / 100,
+      gH = H / 8;
+    ctx.strokeStyle = "#1a3a1a";
+    ctx.lineWidth = 0.7;
+    for (let x = 0; x <= W; x += gW * 5) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, H);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= H; y += gH) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+    }
+    ctx.strokeStyle = "#0d1f0d";
+    ctx.lineWidth = 0.3;
+    for (let x = 0; x <= W; x += gW) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, H);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= H; y += gH / 5) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+    }
 
-// ── Status ─────────────────────────────────────────────────────────────────
-function setStatus(status, msg) {
-  const dot = document.getElementById('status-dot');
-  const lbl = document.getElementById('status-label');
-  const colors = { connecting:'#f59e0b', connected:'#10b981', stopped:'#94a3b8', error:'#f43f5e', idle:'#94a3b8' };
-  dot.style.background = colors[status] || '#94a3b8';
-  lbl.textContent = msg || status.toUpperCase();
-  lbl.style.color = status === 'error' ? '#f43f5e' : '';
-}
+    if (liveBufFilled === 0) return;
+    const count = Math.min(liveBufFilled, LIVE_WIN);
+    const start = (liveBufHead - count + LIVE_WIN) % LIVE_WIN;
+    const mid = H / 2,
+      gain = H * 0.32,
+      xStep = W / LIVE_WIN;
 
-// ── Prediction update ──────────────────────────────────────────────────────
-function updatePrediction(p) {
-  if (!p || p.error) return;
-  predCount++;
-  currentPrediction = p.prediction;
+    // Line color follows current prediction
+    const colMap = { NSR: "#2ecc71", AFib: "#f59e0b", VTCC: "#f43f5e" };
+    const lineColor = colMap[currentPrediction] || "#2ecc71";
 
-  const colMap = { NSR:'#10b981', AFib:'#f59e0b', VTCC:'#f43f5e' };
-  const col = colMap[p.prediction] || '#94a3b8';
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = 1.5;
+    ctx.shadowColor = lineColor;
+    ctx.shadowBlur = 4;
+    ctx.beginPath();
+    for (let i = 0; i < count; i++) {
+      const s = liveBuf[(start + i) % LIVE_WIN];
+      const x = i * xStep,
+        y = mid - s * gain;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
 
-  document.getElementById('pred-label').textContent = p.prediction;
-  document.getElementById('pred-label').style.color = col;
-  document.getElementById('pred-confidence').textContent =
-    `${(p.probabilities[p.prediction] * 100).toFixed(1)}% confidence`;
-  document.getElementById('pred-confidence').style.color = col;
-  document.getElementById('pred-time').textContent = 'Updated ' + new Date().toLocaleTimeString();
-  document.getElementById('stat-preds').textContent = predCount;
+    // Write cursor
+    const cx = (count / LIVE_WIN) * W;
+    ctx.strokeStyle = lineColor.replace(")", ",0.15)").replace("rgb", "rgba");
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, 0);
+    ctx.lineTo(cx, H);
+    ctx.stroke();
+  }
 
-  // Probability bars
-  document.getElementById('pred-bars').innerHTML = Object.entries(p.probabilities).map(([cls, prob]) => {
-    const c = colMap[cls] || '#94a3b8';
-    const pct = (prob * 100).toFixed(1);
-    return `<div>
+  function renderLoop() {
+    drawFrame();
+    liveAnimFrame = requestAnimationFrame(renderLoop);
+  }
+
+  // ── Status ─────────────────────────────────────────────────────────────────
+  function setStatus(status, msg) {
+    const dot = document.getElementById("status-dot");
+    const lbl = document.getElementById("status-label");
+    const colors = {
+      connecting: "#f59e0b",
+      connected: "#10b981",
+      stopped: "#94a3b8",
+      error: "#f43f5e",
+      idle: "#94a3b8",
+    };
+    dot.style.background = colors[status] || "#94a3b8";
+    lbl.textContent = msg || status.toUpperCase();
+    lbl.style.color = status === "error" ? "#f43f5e" : "";
+  }
+
+  // ── Prediction update ──────────────────────────────────────────────────────
+  function updatePrediction(p) {
+    if (!p || p.error) return;
+    predCount++;
+    currentPrediction = p.prediction;
+
+    const colMap = { NSR: "#10b981", AFib: "#f59e0b", VTCC: "#f43f5e" };
+    const col = colMap[p.prediction] || "#94a3b8";
+
+    document.getElementById("pred-label").textContent = p.prediction;
+    document.getElementById("pred-label").style.color = col;
+    document.getElementById("pred-confidence").textContent =
+      `${(p.probabilities[p.prediction] * 100).toFixed(1)}% confidence`;
+    document.getElementById("pred-confidence").style.color = col;
+    document.getElementById("pred-time").textContent =
+      "Updated " + new Date().toLocaleTimeString();
+    document.getElementById("stat-preds").textContent = predCount;
+
+    // Probability bars
+    document.getElementById("pred-bars").innerHTML = Object.entries(
+      p.probabilities,
+    )
+      .map(([cls, prob]) => {
+        const c = colMap[cls] || "#94a3b8";
+        const pct = (prob * 100).toFixed(1);
+        return `<div>
       <div style="display:flex;justify-content:space-between;font-size:8px;font-weight:900;color:#94a3b8;text-transform:uppercase;margin-bottom:3px">
         <span>${cls}</span><span>${pct}%</span>
       </div>
       <div style="background:#1e293b;height:5px;border-radius:4px;overflow:hidden">
-        <div style="height:100%;width:${pct}%;background:${cls===p.prediction?c:'#334155'};border-radius:4px;transition:width 0.3s"></div>
+        <div style="height:100%;width:${pct}%;background:${cls === p.prediction ? c : "#334155"};border-radius:4px;transition:width 0.3s"></div>
       </div>
     </div>`;
-  }).join('');
+      })
+      .join("");
 
-  addTimelineDot(p.prediction, col);
-}
+    addTimelineDot(p.prediction, col);
 
-function addTimelineDot(pred, col) {
-  const container = document.getElementById('pred-timeline');
-  if (timelineData.length === 0) container.innerHTML = '';
-  timelineData.push(pred);
-
-  const dot = document.createElement('div');
-  dot.title = `${pred} @ ${new Date().toLocaleTimeString()}`;
-  dot.style.cssText = `width:20px;height:20px;border-radius:50%;background:${col};border:2px solid ${col};
-    flex-shrink:0;cursor:default;transition:transform 0.2s;box-shadow:0 0 6px ${col}40;`;
-  dot.onmouseenter = () => dot.style.transform = 'scale(1.4)';
-  dot.onmouseleave = () => dot.style.transform = 'scale(1)';
-  container.appendChild(dot);
-  container.scrollLeft = container.scrollWidth;
-
-  if (timelineData.length > 120) {
-    timelineData.shift();
-    container.removeChild(container.firstChild);
+    // Persist latest prediction for chatbot context
+    localStorage.setItem(
+      "tensorx_live_prediction",
+      JSON.stringify({
+        prediction: p.prediction,
+        confidence: (p.probabilities[p.prediction] * 100).toFixed(1),
+        source: "live_stream",
+        timestamp: new Date().toISOString(),
+      }),
+    );
   }
-}
 
-function clearHistory() {
-  timelineData = [];
-  predCount = 0;
-  document.getElementById('pred-timeline').innerHTML =
-    '<p class="text-[10px] text-slate-300 font-bold uppercase tracking-widest">Predictions will appear here every second...</p>';
-  document.getElementById('stat-preds').textContent = '0';
-}
+  function addTimelineDot(pred, col) {
+    const container = document.getElementById("pred-timeline");
+    if (timelineData.length === 0) container.innerHTML = "";
+    timelineData.push(pred);
 
-// ── WebSocket ──────────────────────────────────────────────────────────────
-function connectWS(sessionId, onReady) {
-  if (liveWs) { liveWs.close(); liveWs = null; }
-  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-  liveWs = new WebSocket(`${proto}://${location.host}/ws/live`);
+    const dot = document.createElement("div");
+    dot.title = `${pred} @ ${new Date().toLocaleTimeString()}`;
+    dot.style.cssText = `width:20px;height:20px;border-radius:50%;background:${col};border:2px solid ${col};
+    flex-shrink:0;cursor:default;transition:transform 0.2s;box-shadow:0 0 6px ${col}40;`;
+    dot.onmouseenter = () => (dot.style.transform = "scale(1.4)");
+    dot.onmouseleave = () => (dot.style.transform = "scale(1)");
+    container.appendChild(dot);
+    container.scrollLeft = container.scrollWidth;
 
-  liveWs.onopen = () => {
-    document.getElementById('canvas-idle').style.display = 'none';
-    document.getElementById('live-badge').style.display = 'flex';
-    if (!liveAnimFrame) renderLoop();
-    if (onReady) onReady();
-  };
-  liveWs.onclose = () => setStatus('stopped');
-  liveWs.onerror = () => setStatus('error', 'WebSocket error');
-
-  liveWs.onmessage = (e) => {
-    const msg = JSON.parse(e.data);
-
-    if (msg.type === 'bridge_status') {
-      setStatus(msg.status, msg.message);
-      return;
+    if (timelineData.length > 120) {
+      timelineData.shift();
+      container.removeChild(container.firstChild);
     }
+  }
 
-    if (msg.type === 'alert') {
-      showAlert(msg);
-      return;
+  function clearHistory() {
+    timelineData = [];
+    predCount = 0;
+    document.getElementById("pred-timeline").innerHTML =
+      '<p class="text-[10px] text-slate-300 font-bold uppercase tracking-widest">Predictions will appear here every second...</p>';
+    document.getElementById("stat-preds").textContent = "0";
+  }
+
+  // ── WebSocket ──────────────────────────────────────────────────────────────
+  function connectWS(sessionId, onReady) {
+    if (liveWs) {
+      liveWs.close();
+      liveWs = null;
     }
+    const proto = location.protocol === "https:" ? "wss" : "ws";
+    liveWs = new WebSocket(`${proto}://${location.host}/ws/live`);
 
-    if (msg.type === 'segment') {
-      document.getElementById('info-segment').textContent = `#${msg.segment_idx}`;
-      document.getElementById('canvas-label').textContent =
-        `${msg.rhythm || ''} · ${msg.source || ''}`;
-      return;
-    }
+    liveWs.onopen = () => {
+      document.getElementById("canvas-idle").style.display = "none";
+      document.getElementById("live-badge").style.display = "flex";
+      if (!liveAnimFrame) renderLoop();
+      if (onReady) onReady();
+    };
+    liveWs.onclose = () => setStatus("stopped");
+    liveWs.onerror = () => setStatus("error", "WebSocket error");
 
-    if (msg.type === 'live') {
-      for (const s of msg.samples) {
-        liveBuf[liveBufHead] = s;
-        liveBufHead = (liveBufHead + 1) % LIVE_WIN;
-        if (liveBufFilled < LIVE_WIN) liveBufFilled++;
+    liveWs.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+
+      if (msg.type === "bridge_status") {
+        setStatus(msg.status, msg.message);
+        return;
       }
-      document.getElementById('stat-samples').textContent = (msg.samples_sent || 0).toLocaleString();
-      document.getElementById('stat-elapsed').textContent = (msg.elapsed || 0) + 's';
 
-      if (msg.prediction_update) updatePrediction(msg.prediction_update);
-    }
-  };
-}
+      if (msg.type === "alert") {
+        showAlert(msg);
+        return;
+      }
 
-// ── Alert handler ─────────────────────────────────────────────────────────
-function showAlert(msg) {
-  const banner = document.getElementById('alert-banner');
-  const colMap = { VTCC: '#f43f5e', AFib: '#f59e0b' };
-  const col = colMap[msg.prediction] || '#f43f5e';
+      if (msg.type === "segment") {
+        document.getElementById("info-segment").textContent =
+          `#${msg.segment_idx}`;
+        document.getElementById("canvas-label").textContent =
+          `${msg.rhythm || ""} · ${msg.source || ""}`;
+        return;
+      }
 
-  // Banner
-  banner.style.borderColor = col;
-  banner.style.background = msg.prediction === 'AFib' ? '#fffbeb' : '#fff1f2';
-  document.getElementById('alert-title').textContent = `⚠ ${msg.prediction} DETECTED — EMERGENCY`;
-  document.getElementById('alert-title').style.color = col;
-  document.getElementById('alert-body').textContent =
-    `${msg.confidence}% confidence · Simulator: ${msg.rhythm} (${msg.source})`;
-  document.getElementById('alert-body').style.color = col;
+      if (msg.type === "live") {
+        for (const s of msg.samples) {
+          liveBuf[liveBufHead] = s;
+          liveBufHead = (liveBufHead + 1) % LIVE_WIN;
+          if (liveBufFilled < LIVE_WIN) liveBufFilled++;
+        }
+        document.getElementById("stat-samples").textContent = (
+          msg.samples_sent || 0
+        ).toLocaleString();
+        document.getElementById("stat-elapsed").textContent =
+          (msg.elapsed || 0) + "s";
 
-  const espBadge = document.getElementById('alert-esp');
-  const n8nBadge = document.getElementById('alert-n8n');
-  msg.esp_triggered     ? espBadge.classList.remove('hidden') : espBadge.classList.add('hidden');
-  msg.webhook_triggered ? n8nBadge.classList.remove('hidden') : n8nBadge.classList.add('hidden');
+        if (msg.prediction_update) updatePrediction(msg.prediction_update);
+      }
+    };
+  }
 
-  banner.classList.remove('hidden');
-  // Auto-dismiss after 15s
-  clearTimeout(banner._dismissTimer);
-  banner._dismissTimer = setTimeout(() => banner.classList.add('hidden'), 15000);
+  // ── Alert handler ─────────────────────────────────────────────────────────
+  function showAlert(msg) {
+    const banner = document.getElementById("alert-banner");
+    const colMap = { VTCC: "#f43f5e", AFib: "#f59e0b" };
+    const col = colMap[msg.prediction] || "#f43f5e";
 
-  // Alert log entry
-  const log = document.getElementById('alert-log');
-  if (log.querySelector('p')) log.innerHTML = '';
-  const entry = document.createElement('div');
-  entry.style.cssText = `padding:6px 10px;border-radius:10px;border-left:3px solid ${col};background:${msg.prediction==='AFib'?'#fffbeb':'#fff1f2'};`;
-  entry.innerHTML = `
+    // Banner
+    banner.style.borderColor = col;
+    banner.style.background = msg.prediction === "AFib" ? "#fffbeb" : "#fff1f2";
+    document.getElementById("alert-title").textContent =
+      `⚠ ${msg.prediction} DETECTED — EMERGENCY`;
+    document.getElementById("alert-title").style.color = col;
+    document.getElementById("alert-body").textContent =
+      `${msg.confidence}% confidence · Simulator: ${msg.rhythm} (${msg.source})`;
+    document.getElementById("alert-body").style.color = col;
+
+    const espBadge = document.getElementById("alert-esp");
+    const n8nBadge = document.getElementById("alert-n8n");
+    msg.esp_triggered
+      ? espBadge.classList.remove("hidden")
+      : espBadge.classList.add("hidden");
+    msg.webhook_triggered
+      ? n8nBadge.classList.remove("hidden")
+      : n8nBadge.classList.add("hidden");
+
+    banner.classList.remove("hidden");
+    // Auto-dismiss after 15s
+    clearTimeout(banner._dismissTimer);
+    banner._dismissTimer = setTimeout(
+      () => banner.classList.add("hidden"),
+      15000,
+    );
+
+    // Alert log entry
+    const log = document.getElementById("alert-log");
+    if (log.querySelector("p")) log.innerHTML = "";
+    const entry = document.createElement("div");
+    entry.style.cssText = `padding:6px 10px;border-radius:10px;border-left:3px solid ${col};background:${msg.prediction === "AFib" ? "#fffbeb" : "#fff1f2"};`;
+    entry.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center">
       <span style="font-size:9px;font-weight:900;color:${col};text-transform:uppercase;letter-spacing:0.1em">${msg.prediction}</span>
       <span style="font-size:8px;color:#94a3b8;font-weight:700">${new Date().toLocaleTimeString()}</span>
     </div>
     <p style="font-size:8px;color:#64748b;margin-top:2px">${msg.confidence}% · ${msg.rhythm}</p>
     <div style="display:flex;gap:4px;margin-top:4px">
-      ${msg.esp_triggered     ? '<span style="font-size:7px;font-weight:900;color:#f43f5e;text-transform:uppercase">ESP32 ✓</span>' : ''}
-      ${msg.webhook_triggered ? '<span style="font-size:7px;font-weight:900;color:#f43f5e;text-transform:uppercase">n8n ✓</span>'   : ''}
+      ${msg.esp_triggered ? '<span style="font-size:7px;font-weight:900;color:#f43f5e;text-transform:uppercase">ESP32 ✓</span>' : ""}
+      ${msg.webhook_triggered ? '<span style="font-size:7px;font-weight:900;color:#f43f5e;text-transform:uppercase">n8n ✓</span>' : ""}
     </div>`;
-  log.prepend(entry);
-}
-
-// ── Connect flow ───────────────────────────────────────────────────────────
-async function fetchAndConnect() {
-  const host = document.getElementById('sim-host').value.trim();
-  setStatus('connecting', 'Fetching session...');
-
-  // Auto-fetch session ID
-  try {
-    const res = await fetch(`/live/active-session?simulator_host=${encodeURIComponent(host)}`);
-    const data = await res.json();
-    if (data.session_id) {
-      document.getElementById('sim-session').value = data.session_id;
-    } else {
-      setStatus('error', 'No active session on simulator');
-      return;
-    }
-  } catch {
-    setStatus('error', 'Cannot reach simulator');
-    return;
+    log.prepend(entry);
   }
 
-  const sid = document.getElementById('sim-session').value.trim();
-  document.getElementById('info-session').textContent = sid.slice(0, 8) + '...';
-  document.getElementById('info-host').textContent = host;
+  // ── Connect flow ───────────────────────────────────────────────────────────
+  async function fetchAndConnect() {
+    const host = document.getElementById("sim-host").value.trim();
+    setStatus("connecting", "Fetching session...");
 
-  liveBuf.fill(0); liveBufHead = 0; liveBufFilled = 0;
+    // Auto-fetch session ID
+    try {
+      const res = await fetch(
+        `/live/active-session?simulator_host=${encodeURIComponent(host)}`,
+      );
+      const data = await res.json();
+      if (data.session_id) {
+        document.getElementById("sim-session").value = data.session_id;
+      } else {
+        setStatus("error", "No active session on simulator");
+        return;
+      }
+    } catch {
+      setStatus("error", "Cannot reach simulator");
+      return;
+    }
 
-  connectWS(sid, async () => {
-    await fetch('/live/start', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ simulator_host: host, session_id: sid })
+    const sid = document.getElementById("sim-session").value.trim();
+    document.getElementById("info-session").textContent =
+      sid.slice(0, 8) + "...";
+    document.getElementById("info-host").textContent = host;
+
+    liveBuf.fill(0);
+    liveBufHead = 0;
+    liveBufFilled = 0;
+
+    connectWS(sid, async () => {
+      await fetch("/live/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ simulator_host: host, session_id: sid }),
+      });
     });
+  }
+
+  async function disconnect() {
+    await fetch("/live/stop", { method: "POST" });
+    if (liveWs) {
+      liveWs.close();
+      liveWs = null;
+    }
+    if (liveAnimFrame) {
+      cancelAnimationFrame(liveAnimFrame);
+      liveAnimFrame = null;
+    }
+    document.getElementById("canvas-idle").style.display = "flex";
+    document.getElementById("live-badge").style.display = "none";
+    setStatus("stopped");
+  }
+
+  // Auto-connect on load
+  window.addEventListener("load", () => {
+    resizeCanvas();
+    loadVitalsFromStorage();
+    fetchAndConnect();
   });
-}
 
-async function disconnect() {
-  await fetch('/live/stop', { method: 'POST' });
-  if (liveWs) { liveWs.close(); liveWs = null; }
-  if (liveAnimFrame) { cancelAnimationFrame(liveAnimFrame); liveAnimFrame = null; }
-  document.getElementById('canvas-idle').style.display = 'flex';
-  document.getElementById('live-badge').style.display = 'none';
-  setStatus('stopped');
-}
+  // ── Patient Profile Modal ──────────────────────────────────────────────────
+  function openVitalsModal() {
+    document.getElementById("vitalsModal").classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+  }
+  function closeVitalsModal() {
+    document.getElementById("vitalsModal").classList.add("hidden");
+    document.body.style.overflow = "auto";
+  }
 
-// Auto-connect on load
-window.addEventListener('load', () => { resizeCanvas(); fetchAndConnect(); });
+  function saveVitalsToStorage() {
+    const v = {
+      name: document.getElementById("inp_name").value,
+      age: document.getElementById("inp_age").value,
+      email: document.getElementById("inp_email").value,
+      blood_group: document.getElementById("inp_blood_group").value,
+      doctor_email: document.getElementById("inp_doctor_email").value,
+      icu_ward: document.getElementById("inp_icu_ward").value,
+      icu_room: document.getElementById("inp_icu_room").value,
+      hr: document.getElementById("inp_hr").value,
+      sys: document.getElementById("inp_bp_sys").value,
+      dia: document.getElementById("inp_bp_dia").value,
+      spo2: document.getElementById("inp_spo2").value,
+      sugar: document.getElementById("inp_sugar").value,
+      temp: document.getElementById("inp_temp").value,
+    };
+    localStorage.setItem("tensorx_vitals", JSON.stringify(v));
+  }
+
+  function loadVitalsFromStorage() {
+    const saved = localStorage.getItem("tensorx_vitals");
+    if (!saved) return;
+    const v = JSON.parse(saved);
+    const set = (id, val) => {
+      if (val && document.getElementById(id))
+        document.getElementById(id).value = val;
+    };
+    set("inp_name", v.name);
+    set("inp_age", v.age);
+    set("inp_email", v.email);
+    set("inp_blood_group", v.blood_group);
+    set("inp_doctor_email", v.doctor_email);
+    set("inp_icu_ward", v.icu_ward);
+    set("inp_icu_room", v.icu_room);
+    set("inp_hr", v.hr);
+    set("inp_bp_sys", v.sys);
+    set("inp_bp_dia", v.dia);
+    set("inp_spo2", v.spo2);
+    set("inp_sugar", v.sugar);
+    set("inp_temp", v.temp);
+    updateVitalsDisplay(v);
+  }
+
+  function confirmVitals() {
+    saveVitalsToStorage();
+    const v = JSON.parse(localStorage.getItem("tensorx_vitals") || "{}");
+    updateVitalsDisplay(v);
+    closeVitalsModal();
+  }
+
+  function updateVitalsDisplay(v) {
+    if (v.name) document.getElementById("vital_name").textContent = v.name;
+    if (v.hr)
+      document.getElementById("vital_hr").innerHTML =
+        v.hr +
+        ' <span class="text-xs text-slate-300 not-italic uppercase">Bpm</span>';
+    if (v.sys && v.dia)
+      document.getElementById("vital_bp").textContent = v.sys + " / " + v.dia;
+    if (v.spo2)
+      document.getElementById("vital_spo2").innerHTML =
+        v.spo2 + ' <span class="text-xs text-slate-300 not-italic">%</span>';
+  }
 </script>
+
+<!-- Patient Profile Modal -->
+<div
+  id="vitalsModal"
+  class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4"
+>
+  <div
+    class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+    onclick="closeVitalsModal()"
+  ></div>
+  <div
+    class="relative bg-white w-full max-w-2xl rounded-[2.5rem] p-8 md:p-10 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto"
+  >
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-4">
+        <div
+          class="w-12 h-12 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center text-xl shadow-inner"
+        >
+          <i class="fas fa-user-injured"></i>
+        </div>
+        <h2
+          class="text-2xl font-black text-slate-900 tracking-tight uppercase italic"
+        >
+          Patient Profile
+        </h2>
+      </div>
+      <button
+        onclick="closeVitalsModal()"
+        class="text-slate-300 hover:text-slate-900 transition-colors text-xl"
+      >
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="space-y-6">
+      <!-- Patient Info -->
+      <div class="bg-slate-50 rounded-2xl p-6 border-2 border-slate-100">
+        <h3
+          class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2"
+        >
+          <i class="fas fa-id-card text-blue-500"></i> Patient Information
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label
+              class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1"
+              >Full Name</label
+            >
+            <input
+              type="text"
+              id="inp_name"
+              placeholder="John Doe"
+              class="w-full bg-white border-2 border-slate-200 rounded-2xl px-6 py-3 text-sm font-bold focus:border-blue-500 outline-none transition-all"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1"
+              >Age</label
+            >
+            <input
+              type="number"
+              id="inp_age"
+              placeholder="45"
+              class="w-full bg-white border-2 border-slate-200 rounded-2xl px-6 py-3 text-sm font-bold focus:border-blue-500 outline-none transition-all"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1"
+              >Email ID</label
+            >
+            <input
+              type="email"
+              id="inp_email"
+              placeholder="patient@example.com"
+              class="w-full bg-white border-2 border-slate-200 rounded-2xl px-6 py-3 text-sm font-medium focus:border-blue-500 outline-none transition-all"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1"
+              >Blood Group</label
+            >
+            <select
+              id="inp_blood_group"
+              class="w-full bg-white border-2 border-slate-200 rounded-2xl px-6 py-3 text-sm font-bold focus:border-blue-500 outline-none transition-all"
+            >
+              <option value="">Select</option>
+              <option>A+</option>
+              <option>A-</option>
+              <option>B+</option>
+              <option>B-</option>
+              <option>AB+</option>
+              <option>AB-</option>
+              <option>O+</option>
+              <option>O-</option>
+            </select>
+          </div>
+          <div>
+            <label
+              class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1"
+              >Doctor Email</label
+            >
+            <input
+              type="email"
+              id="inp_doctor_email"
+              placeholder="doctor@hospital.com"
+              class="w-full bg-white border-2 border-slate-200 rounded-2xl px-6 py-3 text-sm font-medium focus:border-blue-500 outline-none transition-all"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1"
+              >ICU Ward</label
+            >
+            <input
+              type="text"
+              id="inp_icu_ward"
+              placeholder="e.g. Cardiology ICU"
+              class="w-full bg-white border-2 border-slate-200 rounded-2xl px-6 py-3 text-sm font-bold focus:border-blue-500 outline-none transition-all"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1"
+              >ICU Room / Bed</label
+            >
+            <input
+              type="text"
+              id="inp_icu_room"
+              placeholder="e.g. Room 12 - Bed B"
+              class="w-full bg-white border-2 border-slate-200 rounded-2xl px-6 py-3 text-sm font-bold focus:border-blue-500 outline-none transition-all"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Vital Signs -->
+      <div class="bg-rose-50 rounded-2xl p-6 border-2 border-rose-100">
+        <h3
+          class="text-[10px] font-black text-rose-600 uppercase tracking-widest mb-4 flex items-center gap-2"
+        >
+          <i class="fas fa-heartbeat"></i> Vital Signs
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label
+              class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1"
+              >Heart Rate (BPM)</label
+            >
+            <input
+              type="number"
+              id="inp_hr"
+              placeholder="60-100"
+              class="w-full bg-white border-2 border-rose-200 rounded-2xl px-6 py-3 text-lg font-black italic focus:border-rose-500 outline-none transition-all"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1"
+              >SpO2 Oxygen (%)</label
+            >
+            <input
+              type="number"
+              id="inp_spo2"
+              placeholder="95-100"
+              class="w-full bg-white border-2 border-rose-200 rounded-2xl px-6 py-3 text-lg font-black italic focus:border-rose-500 outline-none transition-all"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1"
+              >BP Systolic (mmHg)</label
+            >
+            <input
+              type="number"
+              id="inp_bp_sys"
+              placeholder="90-140"
+              class="w-full bg-white border-2 border-rose-200 rounded-2xl px-6 py-3 text-lg font-black italic focus:border-rose-500 outline-none transition-all"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1"
+              >BP Diastolic (mmHg)</label
+            >
+            <input
+              type="number"
+              id="inp_bp_dia"
+              placeholder="60-90"
+              class="w-full bg-white border-2 border-rose-200 rounded-2xl px-6 py-3 text-lg font-black italic focus:border-rose-500 outline-none transition-all"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Lab Values -->
+      <div class="bg-amber-50 rounded-2xl p-6 border-2 border-amber-100">
+        <h3
+          class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-4 flex items-center gap-2"
+        >
+          <i class="fas fa-vial"></i> Lab Values (Optional)
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label
+              class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1"
+              >Blood Sugar (mg/dL)</label
+            >
+            <input
+              type="number"
+              id="inp_sugar"
+              placeholder="70-140"
+              class="w-full bg-white border-2 border-amber-200 rounded-2xl px-6 py-3 text-sm font-bold focus:border-amber-500 outline-none transition-all"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1"
+              >Temperature (&deg;F)</label
+            >
+            <input
+              type="number"
+              step="0.1"
+              id="inp_temp"
+              placeholder="97-99"
+              class="w-full bg-white border-2 border-amber-200 rounded-2xl px-6 py-3 text-sm font-bold focus:border-amber-500 outline-none transition-all"
+            />
+          </div>
+        </div>
+      </div>
+
+      <button
+        onclick="confirmVitals()"
+        class="w-full bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white font-black py-5 rounded-2xl shadow-xl shadow-blue-200 transition-all active:scale-95 uppercase tracking-widest"
+      >
+        <i class="fas fa-save mr-2"></i>Save Patient Profile
+      </button>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
